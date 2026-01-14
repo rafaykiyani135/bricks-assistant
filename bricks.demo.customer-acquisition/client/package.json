@@ -1,0 +1,43 @@
+{
+  "name": "client",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint --fix .",
+    "format": "prettier --write .",
+    "codegen": "graphql-codegen --config codegen.ts"
+  },
+  "dependencies": {
+    "@apollo/client": "^4.0.9",
+    "@nuxt/eslint": "^1.10.0",
+    "@nuxt/ui": "^4.2.0",
+    "@pinia/nuxt": "^0.11.3",
+    "@vee-validate/zod": "^4.15.1",
+    "dayjs": "^1.11.19",
+    "graphql": "^16.12.0",
+    "nuxt": "^4.2.1",
+    "pinia": "^3.0.4",
+    "vee-validate": "^4.15.1",
+    "vue": "^3.5.24",
+    "vue-router": "^4.6.3",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "6.1.0",
+    "@graphql-codegen/client-preset": "^5.2.0",
+    "@graphql-codegen/schema-ast": "^5.0.0",
+    "@tailwindcss/vite": "^4.1.17",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.7.1",
+    "tailwindcss": "^4.1.17",
+    "typescript": "^5.9.3"
+  }
+}

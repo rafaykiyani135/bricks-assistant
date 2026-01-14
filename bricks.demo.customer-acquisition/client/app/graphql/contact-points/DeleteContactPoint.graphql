@@ -1,0 +1,9 @@
+mutation DeleteContactPoint($id: ID!) {
+  deleteContactPoint(id: $id) {
+    id
+    name
+    role
+    email
+    phone
+  }
+}

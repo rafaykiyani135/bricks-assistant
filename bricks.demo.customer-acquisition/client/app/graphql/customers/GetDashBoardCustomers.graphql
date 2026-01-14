@@ -1,0 +1,14 @@
+query GetDashBoardCustomer {
+  customers {
+    id
+    name
+    website
+    industry
+    lastInteraction {
+      id
+      date
+      message
+    }
+    interactionCount
+  }
+}

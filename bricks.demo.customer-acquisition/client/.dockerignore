@@ -1,0 +1,35 @@
+# Ignore node modules and local build artifacts
+node_modules
+dist
+build
+/.awcache
+.nuxt
+
+# Logs and system files
+npm-debug.log
+yarn-error.log
+.DS_Store
+*.log
+
+# Editor directories
+.vscode
+.idea
+
+# Git
+.git
+
+# Environment files (if you have environment files, don't include them in the image)
+.env
+.env.*
+
+# Coverage and test output
+coverage
+
+# Temporary files
+tmp
+temp
+/.cache
+
+# Keep package.json and lockfiles (we need them for npm ci)
+# package-lock.json
+# yarn.lock

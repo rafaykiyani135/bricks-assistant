@@ -1,0 +1,25 @@
+mutation CreateContactPoint(
+  $customerId: ID!
+  $name: String!
+  $role: String
+  $email: String
+  $phone: String
+  $override: Boolean
+) {
+  createContactPoint(
+    input: {
+      customerId: $customerId
+      name: $name
+      role: $role
+      email: $email
+      phone: $phone
+      override: $override
+    }
+  ) {
+    id
+    name
+    role
+    email
+    phone
+  }
+}

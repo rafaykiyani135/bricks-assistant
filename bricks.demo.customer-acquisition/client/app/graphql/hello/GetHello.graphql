@@ -1,0 +1,6 @@
+query GetHello($message: String!) {
+  getHello(message: $message) {
+    id
+    message
+  }
+}

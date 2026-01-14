@@ -1,0 +1,8 @@
+mutation CreateInteraction($input: CreateInteractionSummaryInput!) {
+  createInteractionSummary(input: $input) {
+    id
+    date
+    type
+    message
+  }
+}

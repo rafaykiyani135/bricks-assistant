@@ -1,0 +1,19 @@
+query GetCustomerContactPoints($id: ID!) {
+  customer(id: $id) {
+    id
+    name
+    contactPoints {
+      id
+      name
+      role
+      email
+      phone
+      interactions {
+        id
+        date
+        type
+        message
+      }
+    }
+  }
+}
