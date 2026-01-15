@@ -1,0 +1,23 @@
+{
+  "name": "rag",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@lancedb/lancedb": "^0.23.0",
+    "@types/node": "^25.0.9",
+    "dotenv": "^17.2.3",
+    "groq-sdk": "^0.37.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
