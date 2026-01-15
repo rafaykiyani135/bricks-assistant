@@ -129,14 +129,27 @@ export function findFrontendFiles(directory: string): {
     const vueFiles = findVueFiles(directory);
     const tsFiles = findTypeScriptFiles(directory);
 
-    // Separate stores and composables from other TS files
+    // Separate stores and composables based on content or directory
     const storeFiles = tsFiles.filter((f) => {
         const path = f.relativePath.replace(/\\/g, '/');
-        return path.includes('/stores/') || path.startsWith('stores/');
+        // Folder check
+        if (path.includes('/stores/') || path.startsWith('stores/')) return true;
+        
+        // Content check (Pinia or Vuex)
+        return f.content.includes('defineStore') || f.content.includes('createStore');
     });
+
     const composableFiles = tsFiles.filter((f) => {
         const path = f.relativePath.replace(/\\/g, '/');
-        return path.includes('/composables/') || path.startsWith('composables/');
+        // Folder check
+        if (path.includes('/composables/') || path.startsWith('composables/')) return true;
+        
+        // Content check (start with useX and exports functions)
+        const fileName = getFileName(f.relativePath);
+        if (fileName.startsWith('use')) {
+             return f.content.includes('export function') || f.content.includes('export const');
+        }
+        return false;
     });
 
     return { vueFiles, storeFiles, composableFiles };

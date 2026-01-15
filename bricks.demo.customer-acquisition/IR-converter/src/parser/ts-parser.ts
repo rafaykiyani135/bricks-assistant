@@ -137,6 +137,13 @@ export function findDecorators(node: SyntaxNode): SyntaxNode[] {
         while (sibling) {
             if (sibling.type === 'decorator') {
                 decorators.unshift(sibling); // Add to front to maintain order
+            } else if (
+                sibling.type !== 'comment' &&
+                sibling.type !== 'export' &&
+                sibling.type !== 'accessibility_modifier' // e.g., public, private
+            ) {
+                // Stop if we hit something that isn't a decorator or valid modifier
+                break;
             }
             sibling = sibling.previousSibling;
         }

@@ -89,7 +89,12 @@ export function deriveRouteFromPath(filePath: string): string {
 export function classifyVueFile(filePath: string): 'page' | 'component' | 'layout' {
     const normalizedPath = filePath.replace(/\\/g, '/').toLowerCase();
 
-    if (normalizedPath.includes('/pages/') || normalizedPath.startsWith('pages/')) {
+    if (
+        normalizedPath.includes('/pages/') || 
+        normalizedPath.startsWith('pages/') ||
+        normalizedPath.includes('/views/') || 
+        normalizedPath.startsWith('views/')
+    ) {
         return 'page';
     }
     if (normalizedPath.includes('/layouts/') || normalizedPath.startsWith('layouts/')) {
