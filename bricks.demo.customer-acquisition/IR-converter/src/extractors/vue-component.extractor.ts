@@ -8,6 +8,10 @@ import {
     ApiCallIR,
     ComponentFunctionIR,
     PropIR,
+    UILabelIR,
+    UIActionIR,
+    FormFieldIR,
+    DisabledStateIR,
     ExtractionResult,
     ParsedVueFile,
 } from '../types/ir.types';
@@ -22,6 +26,10 @@ import {
     extractComponentUsages,
     extractApiCalls,
     extractFunctions,
+    extractUILabels,
+    extractUIActions,
+    extractFormFields,
+    extractDisabledStates,
 } from '../parser/vue-parser';
 import { ParsedFile } from '../types/ir.types';
 
@@ -72,6 +80,37 @@ export function extractComponent(file: ParsedFile): ExtractionResult<ComponentIR
         calls: f.calls,
     }));
 
+    // Extract UI elements from template
+    const rawLabels = extractUILabels(vueFile.templateContent);
+    const labels: UILabelIR[] = rawLabels.map((l) => ({
+        text: l.text,
+        source: l.source as UILabelIR['source'],
+        element: l.element,
+    }));
+
+    const rawActions = extractUIActions(vueFile.templateContent);
+    const actions: UIActionIR[] = rawActions.map((a) => ({
+        event: a.event as UIActionIR['event'],
+        handler: a.handler,
+        element: a.element,
+        label: a.label,
+    }));
+
+    const rawFormFields = extractFormFields(vueFile.templateContent);
+    const formFields: FormFieldIR[] = rawFormFields.map((f) => ({
+        name: f.name,
+        element: f.element,
+        placeholder: f.placeholder,
+        required: f.required,
+        disabled: f.disabled,
+    }));
+
+    const rawDisabledStates = extractDisabledStates(vueFile.templateContent);
+    const disabledStates: DisabledStateIR[] = rawDisabledStates.map((d) => ({
+        element: d.element,
+        condition: d.condition,
+    }));
+
     components.push({
         name,
         file: file.relativePath,
@@ -84,6 +123,10 @@ export function extractComponent(file: ParsedFile): ExtractionResult<ComponentIR
         composablesUsed,
         apiCalls,
         functions,
+        labels,
+        actions,
+        formFields,
+        disabledStates,
     });
 
     return { items: components, filePath: file.relativePath };

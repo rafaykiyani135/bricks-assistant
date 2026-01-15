@@ -402,3 +402,142 @@ function extractInternalCalls(node: SyntaxNode): string[] {
 
     return [...new Set(calls)]; // Unique calls
 }
+
+// ============ Template UI Extraction Functions ============
+
+/**
+ * Extract UI labels from template (buttons, placeholders, titles, etc.)
+ */
+export function extractUILabels(templateContent: string): { text: string; source: string; element?: string }[] {
+    const labels: { text: string; source: string; element?: string }[] = [];
+
+    // Match label="..." or :label="'...'" on components
+    const labelAttrRegex = /<(\w+)[^>]*\slabel=["']([^"']+)["'][^>]*>/gi;
+    let match;
+    while ((match = labelAttrRegex.exec(templateContent)) !== null) {
+        labels.push({ text: match[2], source: 'button', element: match[1] });
+    }
+
+    // Match placeholder="..."
+    const placeholderRegex = /<(\w+)[^>]*\splaceholder=["']([^"']+)["'][^>]*>/gi;
+    while ((match = placeholderRegex.exec(templateContent)) !== null) {
+        labels.push({ text: match[2], source: 'placeholder', element: match[1] });
+    }
+
+    // Match title="..."
+    const titleRegex = /<(\w+)[^>]*\stitle=["']([^"']+)["'][^>]*>/gi;
+    while ((match = titleRegex.exec(templateContent)) !== null) {
+        labels.push({ text: match[2], source: 'title', element: match[1] });
+    }
+
+    // Match :title="'...'" (bound string literals)
+    const boundTitleRegex = /<(\w+)[^>]*\s:title=["']'([^']+)'["'][^>]*>/gi;
+    while ((match = boundTitleRegex.exec(templateContent)) !== null) {
+        labels.push({ text: match[2], source: 'title', element: match[1] });
+    }
+
+    // Match header="..."
+    const headerRegex = /<(\w+)[^>]*\sheader=["']([^"']+)["'][^>]*>/gi;
+    while ((match = headerRegex.exec(templateContent)) !== null) {
+        labels.push({ text: match[2], source: 'header', element: match[1] });
+    }
+
+    return labels;
+}
+
+/**
+ * Extract UI actions from template (@click, @submit handlers)
+ */
+export function extractUIActions(templateContent: string): { event: string; handler: string; element?: string; label?: string }[] {
+    const actions: { event: string; handler: string; element?: string; label?: string }[] = [];
+
+    // Match @click="handler" or @click="handler(...)"
+    const clickRegex = /<(\w+)[^>]*(?:\slabel=["']([^"']+)["'])?[^>]*\s@click=["']([^"'(]+)(?:\([^)]*\))?["'][^>]*>/gi;
+    let match: RegExpExecArray | null;
+    while ((match = clickRegex.exec(templateContent)) !== null) {
+        actions.push({
+            event: 'click',
+            handler: match[3].trim(),
+            element: match[1],
+            label: match[2] || undefined,
+        });
+    }
+
+    // Also try the reverse order (label after @click)
+    const clickRegex2 = /<(\w+)[^>]*\s@click=["']([^"'(]+)(?:\([^)]*\))?["'][^>]*(?:\slabel=["']([^"']+)["'])?[^>]*>/gi;
+    while ((match = clickRegex2.exec(templateContent)) !== null) {
+        const m = match; // Capture for closure
+        // Avoid duplicates by checking if handler already exists
+        const exists = actions.some(a => a.handler === m[2].trim() && a.element === m[1]);
+        if (!exists) {
+            actions.push({
+                event: 'click',
+                handler: m[2].trim(),
+                element: m[1],
+                label: m[3] || undefined,
+            });
+        }
+    }
+
+    // Match @submit.prevent="handler" or @submit="handler"
+    const submitRegex = /<(form)[^>]*\s@submit(?:\.prevent)?=["']([^"'(]+)(?:\([^)]*\))?["'][^>]*>/gi;
+    while ((match = submitRegex.exec(templateContent)) !== null) {
+        actions.push({
+            event: 'submit',
+            handler: match[2].trim(),
+            element: match[1],
+        });
+    }
+
+    return actions;
+}
+
+/**
+ * Extract form fields from template (v-model bindings)
+ */
+export function extractFormFields(templateContent: string): { name: string; element: string; placeholder?: string; required?: boolean; disabled?: string }[] {
+    const fields: { name: string; element: string; placeholder?: string; required?: boolean; disabled?: string }[] = [];
+
+    // Match v-model="name" with optional placeholder and disabled
+    const vModelRegex = /<(\w+)[^>]*\sv-model=["']([^"']+)["'][^>]*>/gi;
+    let match;
+    while ((match = vModelRegex.exec(templateContent)) !== null) {
+        const fullTag = match[0];
+        const element = match[1];
+        const name = match[2];
+
+        // Extract placeholder if present
+        const placeholderMatch = fullTag.match(/placeholder=["']([^"']+)["']/i);
+        const placeholder = placeholderMatch ? placeholderMatch[1] : undefined;
+
+        // Check for required attribute
+        const required = /\srequired(?:\s|>|=)/i.test(fullTag);
+
+        // Extract :disabled binding if present
+        const disabledMatch = fullTag.match(/:disabled=["']([^"']+)["']/i);
+        const disabled = disabledMatch ? disabledMatch[1] : undefined;
+
+        fields.push({ name, element, placeholder, required, disabled });
+    }
+
+    return fields;
+}
+
+/**
+ * Extract disabled states from template (:disabled bindings)
+ */
+export function extractDisabledStates(templateContent: string): { element: string; condition: string }[] {
+    const states: { element: string; condition: string }[] = [];
+
+    // Match :disabled="condition"
+    const disabledRegex = /<(\w+)[^>]*\s:disabled=["']([^"']+)["'][^>]*>/gi;
+    let match;
+    while ((match = disabledRegex.exec(templateContent)) !== null) {
+        states.push({
+            element: match[1],
+            condition: match[2],
+        });
+    }
+
+    return states;
+}

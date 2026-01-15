@@ -189,7 +189,7 @@ function processFrontend(directory: string): FrontendIR | undefined {
 
 function main() {
     const args = parseArgs(process.argv.slice(2));
-    const outputPath = path.resolve(__dirname, '../output/ir.json');
+    const outputDir = path.resolve(__dirname, '../output');
 
     if (!args.backend && !args.frontend) {
         console.error('Usage: npm run convert -- --backend <path> --frontend <path>');
@@ -208,15 +208,36 @@ function main() {
         frontend = processFrontend(args.frontend);
     }
 
-    // Build unified IR
-    console.log('\n🏗️  Building unified IR...');
-    const ir = buildIR(args.backend, args.frontend, backend, frontend);
+    // Build and write separate IRs
+    console.log('\n🏗️  Building IR files...');
 
-    // Write output
-    writeIR(ir, outputPath);
+    if (backend) {
+        const backendIR = {
+            metadata: {
+                generatedAt: new Date().toISOString(),
+                backendDirectory: args.backend,
+                version: '2.0.0',
+            },
+            backend,
+        };
+        writeIR(backendIR as any, path.join(outputDir, 'backend-ir.json'));
+    }
+
+    if (frontend) {
+        const frontendIR = {
+            metadata: {
+                generatedAt: new Date().toISOString(),
+                frontendDirectory: args.frontend,
+                version: '2.0.0',
+            },
+            frontend,
+        };
+        writeIR(frontendIR as any, path.join(outputDir, 'frontend-ir.json'));
+    }
 
     // Print summary
-    generateStats(ir);
+    const combinedIR = buildIR(args.backend, args.frontend, backend, frontend);
+    generateStats(combinedIR);
 
     console.log('✅ IR generation complete!\n');
 }

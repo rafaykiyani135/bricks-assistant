@@ -138,6 +138,34 @@ export interface ComponentFunctionIR {
     calls: string[]; // Functions or composables called
 }
 
+// ============ UI Extraction Types ============
+
+export interface UILabelIR {
+    text: string;
+    source: 'button' | 'placeholder' | 'title' | 'header' | 'label' | 'alert';
+    element?: string; // e.g., 'UButton', 'UInput'
+}
+
+export interface UIActionIR {
+    event: 'click' | 'submit' | 'change' | 'input';
+    handler: string; // e.g., 'openCreateModal', 'onSubmit'
+    element?: string; // e.g., 'UButton', 'form'
+    label?: string; // Associated label if available
+}
+
+export interface FormFieldIR {
+    name: string; // v-model binding name
+    element: string; // e.g., 'UInput', 'UTextarea'
+    placeholder?: string;
+    required?: boolean;
+    disabled?: string; // Disabled condition if any
+}
+
+export interface DisabledStateIR {
+    element: string;
+    condition: string; // e.g., 'isSubmitting', 'Object.keys(errors).length > 0'
+}
+
 export interface ComponentIR {
     name: string;
     file: string;
@@ -150,6 +178,11 @@ export interface ComponentIR {
     composablesUsed: string[]; // e.g., ['useAuthStore', 'useRouter']
     apiCalls: ApiCallIR[];
     functions: ComponentFunctionIR[];
+    // New UI extraction fields
+    labels: UILabelIR[];
+    actions: UIActionIR[];
+    formFields: FormFieldIR[];
+    disabledStates: DisabledStateIR[];
 }
 
 export interface StoreStateIR {
