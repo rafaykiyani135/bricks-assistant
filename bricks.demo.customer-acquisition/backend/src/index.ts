@@ -6,8 +6,9 @@ import YAML from 'yamljs';
 import path from 'path';
 import { generateFrontendIR } from './api/frontend-ir.controller';
 import { generateBackendIR } from './api/backend-ir.controller';
-import { transformFrontendIR } from './api/transform.controller';
+import { transformFrontendIR, transformBackendIR } from './api/transform.controller';
 import { ingestSimplifiedIR } from './api/ingest.controller';
+import { queryKB } from './api/query.controller';
 
 dotenv.config();
 
@@ -32,9 +33,13 @@ app.post('/api/ir/backend', generateBackendIR);
 
 // Transformation Endpoint
 app.post('/api/transform/frontend', transformFrontendIR);
+app.post('/api/transform/backend', transformBackendIR);
 
 // Ingestion Endpoint
 app.post('/api/ingest', ingestSimplifiedIR);
+
+// Query Endpoint
+app.post('/api/query', queryKB);
 
 app.listen(PORT, () => {
   console.log(`🚀 Unified Backend running on http://localhost:${PORT}`);

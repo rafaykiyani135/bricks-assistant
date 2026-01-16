@@ -1,0 +1,26 @@
+import { Request, Response } from 'express';
+import { queryKnowledgeBase } from '../rag-processing/query';
+
+export async function queryKB(req: Request, res: Response) {
+    try {
+        const { query, tableName } = req.body;
+
+        if (!query) {
+            return res.status(400).json({ error: 'Query string is required' });
+        }
+
+        // Default to backend knowledge base if not specified, 
+        // or we could make it default to frontend. 
+        // Given the recent context, maybe backend is better, or let the user choose.
+        // I'll default to 'frontend_knowledge_base_v1' as per the function default, 
+        // but the user can override it.
+
+        console.log(`Processing query: "${query}" on table: ${tableName || 'default'}`);
+        const result = await queryKnowledgeBase(query, tableName);
+
+        res.json(result);
+    } catch (error: any) {
+        console.error('Error querying knowledge base:', error);
+        res.status(500).json({ error: error.message });
+    }
+}

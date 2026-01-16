@@ -110,7 +110,38 @@ Response:
 }
 ```
 
-### 4. Ingest Simplified IR
+
+### 4. Transform Backend IR
+**POST** `/api/transform/backend`
+
+Request:
+```json
+{
+  "backend": {
+    "modules": [...],
+    "controllers": [...],
+    "services": [...],
+    "dtos": [...]
+  }
+}
+```
+
+Response:
+```json
+{
+  "elements": [
+    {
+      "name": "AuthModule",
+      "type": "module",
+      "summary": "Handles authentication...",
+      "technicalDetails": [...],
+      "dependencies": [...]
+    }
+  ]
+}
+```
+
+### 5. Ingest Simplified IR
 **POST** `/api/ingest`
 
 Request:
@@ -129,6 +160,32 @@ Response:
   "success": true,
   "message": "Successfully ingested 10 elements into frontend_knowledge_base_v1",
   "tableName": "frontend_knowledge_base_v1"
+}
+```
+
+### 6. Query Knowledge Base
+**POST** `/api/query`
+
+Request:
+```json
+{
+  "query": "How do I add a new customer?",
+  "tableName": "backend_knowledge_base_v1" 
+}
+```
+
+Response:
+```json
+{
+  "answer": "To add a new customer, you should use the...",
+  "context": [
+    {
+      "name": "CustomersResolver",
+      "type": "resolver",
+      "text": "...",
+      "distance": 0.12
+    }
+  ]
 }
 ```
 

@@ -38,22 +38,44 @@ export async function ingestToLanceDB(
   console.log('Generating embeddings...');
 
   for (const element of doc.elements) {
-    const textChunk = `
+    let textChunk = '';
+
+    if ('technicalDetails' in element) {
+      // Backend Element
+      textChunk = `
 Name: ${element.name}
 Type: ${element.type}
-Route: ${element.route || 'N/A'}
-Summary: ${element.summaryDescriptionInLaymansTerms}
-Actions: ${element.detailedUserActions.join(', ')}
-Elements: ${element.visibleElements.join(', ')}
-States: ${element.conditionalStates.join(', ')}
-    `.trim();
+Summary: ${element.summary}
+Details: ${(element.technicalDetails || []).join(', ')}
+Dependencies: ${(element.dependencies || []).join(', ')}
+`.trim();
+    } else {
+      // Frontend Element
+      // We cast to any or use the known Frontend interface properties
+      const fe = element as any;
+      textChunk = `
+Name: ${fe.name}
+Type: ${fe.type}
+Route: ${fe.route || 'N/A'}
+Summary: ${fe.summaryDescriptionInLaymansTerms}
+Actions: ${fe.detailedUserActions.join(', ')}
+Elements: ${fe.visibleElements.join(', ')}
+States: ${fe.conditionalStates.join(', ')}
+`.trim();
+    }
 
     const embedding = (await embedder.generate([textChunk]))[0];
+    console.log('text chunk: ', textChunk);
+
+    let route = '';
+    if ('route' in element) {
+      route = (element as any).route || '';
+    }
 
     data.push({
       name: element.name,
       type: element.type,
-      route: element.route || '',
+      route: route,
       text: textChunk,
       vector: embedding,
       original: JSON.stringify(element),

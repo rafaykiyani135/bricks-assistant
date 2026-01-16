@@ -3,7 +3,12 @@ import { ingestToLanceDB } from '../rag-processing/ingest';
 
 export async function ingestSimplifiedIR(req: Request, res: Response) {
   try {
-    const { simplifiedIR, tableName } = req.body;
+    let { simplifiedIR, tableName } = req.body;
+
+    // Allow passing the IR directly without wrapping it in 'simplifiedIR'
+    if (!simplifiedIR && req.body.elements) {
+      simplifiedIR = req.body;
+    }
 
     if (!simplifiedIR || !simplifiedIR.elements) {
       return res.status(400).json({ error: 'Simplified IR with elements array is required' });

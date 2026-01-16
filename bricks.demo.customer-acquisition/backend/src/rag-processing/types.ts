@@ -15,11 +15,20 @@ export interface FrontendIR {
   components: ComponentIR[];
 }
 
-export interface IR {
-  frontend?: FrontendIR;
+export interface BackendIR {
+  modules: any[];
+  controllers: any[];
+  services: any[];
+  dtos: any[];
+  relationships: any;
 }
 
-export interface TransformedElement {
+export interface IR {
+  frontend?: FrontendIR;
+  backend?: BackendIR;
+}
+
+export interface FrontendTransformedElement {
   name: string;
   type: string;
   route?: string;
@@ -28,6 +37,16 @@ export interface TransformedElement {
   visibleElements: string[];
   conditionalStates: string[];
 }
+
+export interface BackendTransformedElement {
+  name: string;
+  type: 'module' | 'controller' | 'service' | 'dto';
+  summary: string;
+  technicalDetails: string[]; // endpoints, methods, or fields
+  dependencies: string[]; // imports, injected services
+}
+
+export type TransformedElement = FrontendTransformedElement | BackendTransformedElement;
 
 export interface ChatbotFriendlyDoc {
   elements: TransformedElement[];

@@ -190,6 +190,53 @@ paths:
         '500':
           description: Internal server error
 
+
+  /api/transform/backend:
+    post:
+      summary: Transform Backend IR to Simplified Hybrid Format
+      description: Uses LLM to transform technical backend IR into hybrid chunks (Modules, Controllers, Services, DTOs)
+      tags:
+        - Transformation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - backend
+              properties:
+                backend:
+                  type: object
+                  properties:
+                    modules:
+                      type: array
+                      items:
+                        type: object
+                    controllers:
+                      type: array
+                      items:
+                        type: object
+                    services:
+                      type: array
+                      items:
+                        type: object
+                    dtos:
+                      type: array
+                      items:
+                        type: object
+      responses:
+        '200':
+          description: Backend IR transformed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimplifiedIR'
+        '400':
+          description: Bad request - IR missing or invalid
+        '500':
+          description: Internal server error
+
   /api/ingest:
     post:
       summary: Ingest Simplified IR into Vector DB
@@ -231,6 +278,47 @@ paths:
                     example: frontend_knowledge_base_v1
         '400':
           description: Bad request - simplified IR missing or invalid
+        '500':
+          description: Internal server error
+
+  /api/query:
+    post:
+      summary: Query the Knowledge Base
+      description: Performs semantic search and generates an answer using Gemini
+      tags:
+        - Query
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - query
+              properties:
+                query:
+                  type: string
+                  example: How does authentication work?
+                tableName:
+                  type: string
+                  default: frontend_knowledge_base_v1
+                  example: backend_knowledge_base_v1
+      responses:
+        '200':
+          description: Answer generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  answer:
+                    type: string
+                  context:
+                    type: array
+                    items:
+                      type: object
+        '400':
+          description: Bad request - query missing
         '500':
           description: Internal server error
 
