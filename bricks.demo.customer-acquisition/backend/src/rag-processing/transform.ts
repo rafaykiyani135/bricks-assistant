@@ -1,20 +1,21 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { IR, ChatbotFriendlyDoc, ComponentIR } from './types';
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+import * as dotenv from "dotenv";
+dotenv.config();
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
 
 export async function transformIRToSimplified(ir: IR): Promise<ChatbotFriendlyDoc> {
   if (!ir.frontend) {
     throw new Error('No frontend data found in IR');
   }
 
-  if (!process.env.GEMINI_API_KEY) {
-    throw new Error('GEMINI_API_KEY is not set in environment variables');
+  if (!process.env.GOOGLE_API_KEY) {
+    throw new Error('GOOGLE_API_KEY is not set in environment variables');
   }
 
   const components: ComponentIR[] = [...ir.frontend.pages, ...ir.frontend.components];
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-  
+
   const prompt = `
 You are an expert at explaining technical frontend architectures to non-technical users.
 I will provide you with a JSON array of technical component descriptions from a "Frontend Intermediate Representation".

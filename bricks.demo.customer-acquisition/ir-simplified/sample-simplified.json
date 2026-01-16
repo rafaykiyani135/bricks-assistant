@@ -1,0 +1,225 @@
+{
+  "elements": [
+    {
+      "name": "login",
+      "type": "page",
+      "route": "/auth/login",
+      "summaryDescriptionInLaymansTerms": "This is the page where you can securely log into the application by entering your username and password.",
+      "detailedUserActions": [
+        "Type your username into the 'Username' field.",
+        "Type your password into the 'Password' field.",
+        "Click the 'Login' button to submit your credentials and access the application."
+      ],
+      "visibleElements": [
+        "Username input field",
+        "Password input field",
+        "Login button"
+      ],
+      "conditionalStates": [
+        "If your login is successful, you will be automatically taken to the dashboard or home page.",
+        "If login fails (e.g., wrong password), an error message will typically appear on screen."
+      ]
+    },
+    {
+      "name": "success",
+      "type": "page",
+      "route": "/auth/success",
+      "summaryDescriptionInLaymansTerms": "This is a brief page that appears after you've successfully logged in or completed another authentication step. It quickly sets up your user session before automatically redirecting you to the main part of the application.",
+      "detailedUserActions": [
+        "No direct user actions are required; this page processes automatically."
+      ],
+      "visibleElements": [
+        "Potentially a loading spinner or a 'Success!' message indicating that your login is complete."
+      ],
+      "conditionalStates": [
+        "Automatically redirects the user to the main dashboard or previous page after verifying their authentication information."
+      ]
+    },
+    {
+      "name": "index",
+      "type": "page",
+      "route": "/customers",
+      "summaryDescriptionInLaymansTerms": "This page shows a list of all your customers. From here, you can add new customers, change their details, or remove them. You can also click on a customer to see more specific information about them.",
+      "detailedUserActions": [
+        "Click a 'Add New Customer' button to open a form for a new customer.",
+        "Click an 'Edit' button next to a customer's name to update their information.",
+        "Click a 'Delete' button next to a customer's name to remove them from the list.",
+        "Click on a customer's name in the list to view their dedicated detail page.",
+        "Fill out a form and click 'Submit' to save new customer details or updates."
+      ],
+      "visibleElements": [
+        "A list or table displaying existing customers with their key information.",
+        "A button to add a new customer.",
+        "Buttons to edit or delete each customer in the list.",
+        "An input form (likely in a pop-up) for adding or editing customer details.",
+        "Confirmation dialogs when deleting a customer."
+      ],
+      "conditionalStates": [
+        "A pop-up form appears when you choose to add or edit a customer.",
+        "The 'Submit' button on the form might be temporarily turned off while the system is saving your changes.",
+        "Success or error messages appear after adding, editing, or deleting a customer.",
+        "A confirmation pop-up asks you to confirm before permanently deleting a customer."
+      ]
+    },
+    {
+      "name": "[customerId]",
+      "type": "page",
+      "route": "/customers/:customerId",
+      "summaryDescriptionInLaymansTerms": "This page provides a detailed view of a specific customer. Here you can see all their contact methods and a history of your interactions. You can add new ways to contact them, update existing ones, or record new interactions.",
+      "detailedUserActions": [
+        "Click a button to add a new contact method (e.g., phone, email) for this customer.",
+        "Click an 'Edit' button next to a contact method to update its details.",
+        "Click a 'Delete' button next to a contact method to remove it.",
+        "Click a button to record a new interaction (e.g., a call, email, meeting) with this customer.",
+        "Fill out a form and click 'Submit' to save new contact point information or updates.",
+        "Fill out a form and click 'Submit' to record a new interaction."
+      ],
+      "visibleElements": [
+        "The customer's name and primary details.",
+        "A list or table showing all contact methods for the customer.",
+        "Buttons to add, edit, or delete contact methods.",
+        "A button to record a new interaction.",
+        "An input form (likely in a pop-up) for adding or editing contact methods.",
+        "An input form (likely in a pop-up) for recording interaction details.",
+        "Confirmation dialogs when deleting a contact method."
+      ],
+      "conditionalStates": [
+        "A loading indicator might appear while the customer's details are being fetched.",
+        "Pop-up forms appear when you choose to add or edit a contact method, or to record an interaction.",
+        "The 'Submit' button on forms might be temporarily turned off while the system is saving changes.",
+        "Success or error messages appear after managing contact points or recording interactions.",
+        "A confirmation pop-up asks you to confirm before permanently deleting a contact method."
+      ]
+    },
+    {
+      "name": "index",
+      "type": "page",
+      "route": "/dashboard",
+      "summaryDescriptionInLaymansTerms": "This is your main dashboard, providing a quick overview of your customers. It highlights which customers might need your attention, for example, if you haven't interacted with them recently.",
+      "detailedUserActions": [
+        "Click on a customer's name or entry in the list to go directly to their detailed customer page."
+      ],
+      "visibleElements": [
+        "Summary cards or sections displaying key information.",
+        "A list or table of customers, possibly showing the date of their last interaction.",
+        "Visual cues (like different colors or icons) to indicate customers who 'need attention'."
+      ],
+      "conditionalStates": [
+        "Customer entries might be highlighted or flagged if they meet certain criteria, such as not having recent interactions."
+      ]
+    },
+    {
+      "name": "app",
+      "type": "component",
+      "route": "N/A",
+      "summaryDescriptionInLaymansTerms": "This is the core shell of the entire application. It sets up the main layout and structure, ensuring common elements like the header and content areas are consistently displayed across all pages. Think of it as the main frame that holds everything together.",
+      "detailedUserActions": [
+        "No direct user actions, it provides the overall framework for the application."
+      ],
+      "visibleElements": [
+        "The application's header (e.g., containing navigation and logo).",
+        "The main area where specific pages (like the dashboard or customer lists) are displayed.",
+        "Potentially a full-screen loading indicator for the entire application startup."
+      ],
+      "conditionalStates": [
+        "A loading screen might appear briefly when the application is first loading or switching between major sections."
+      ]
+    },
+    {
+      "name": "ArkHeader",
+      "type": "component",
+      "route": "N/A",
+      "summaryDescriptionInLaymansTerms": "This is the persistent header at the top of the application. It typically contains the application logo, main navigation links (like 'Dashboard' or 'Customers'), and potentially user-specific options like a logout button or settings.",
+      "detailedUserActions": [
+        "Click on navigation links (e.g., 'Dashboard', 'Customers') to go to different sections of the application.",
+        "Click on a logout button to sign out of your account (if available)."
+      ],
+      "visibleElements": [
+        "Application logo or title.",
+        "Main navigation links.",
+        "User profile icon or name (if logged in).",
+        "Logout button or menu."
+      ],
+      "conditionalStates": [
+        "The active navigation link is highlighted to show which page you are currently viewing.",
+        "Content in the header (like a logout button) might change depending on whether you are logged in."
+      ]
+    },
+    {
+      "name": "DeleteContactPointModal",
+      "type": "component",
+      "route": "N/A",
+      "summaryDescriptionInLaymansTerms": "This is a small pop-up window that appears when you try to remove one of a customer's contact methods (like an email address or phone number). It asks you to confirm your decision before permanently deleting it.",
+      "detailedUserActions": [
+        "Click the 'Confirm Delete' button to permanently remove the contact method.",
+        "Click the 'Cancel' button or outside the pop-up to close it without deleting."
+      ],
+      "visibleElements": [
+        "A pop-up window with a message asking for confirmation (e.g., 'Are you sure you want to delete this contact point?').",
+        "A 'Confirm Delete' button.",
+        "A 'Cancel' button."
+      ],
+      "conditionalStates": [
+        "The 'Confirm Delete' button might be temporarily turned off while the deletion is being processed.",
+        "A brief success or error message might appear after attempting to delete."
+      ]
+    },
+    {
+      "name": "DeleteCustomerModal",
+      "type": "component",
+      "route": "N/A",
+      "summaryDescriptionInLaymansTerms": "This is a small pop-up window that appears when you try to remove a customer from your list. It asks for your final confirmation before permanently deleting the customer and all their associated information.",
+      "detailedUserActions": [
+        "Click the 'Confirm Delete' button to permanently remove the customer.",
+        "Click the 'Cancel' button or outside the pop-up to close it without deleting."
+      ],
+      "visibleElements": [
+        "A pop-up window with a message asking for confirmation (e.g., 'Are you sure you want to delete this customer?').",
+        "A 'Confirm Delete' button.",
+        "A 'Cancel' button."
+      ],
+      "conditionalStates": [
+        "The 'Confirm Delete' button might be temporarily turned off while the deletion is being processed.",
+        "A brief success or error message might appear after attempting to delete."
+      ]
+    },
+    {
+      "name": "RecordInteractionModal",
+      "type": "component",
+      "route": "N/A",
+      "summaryDescriptionInLaymansTerms": "This is a pop-up window that lets you quickly log a new interaction you've had with a customer, such as a phone call, email, or meeting. You can enter details about the interaction here.",
+      "detailedUserActions": [
+        "Fill in the details about the interaction (e.g., type of interaction, date, notes).",
+        "Click the 'Save Interaction' button to record the details.",
+        "Click the 'Cancel' button or outside the pop-up to close it without saving."
+      ],
+      "visibleElements": [
+        "A pop-up window containing input fields for interaction details (e.g., interaction type, date, notes).",
+        "A 'Save Interaction' button.",
+        "A 'Cancel' button."
+      ],
+      "conditionalStates": [
+        "The 'Save Interaction' button might be disabled if required fields are left empty or while the system is saving the interaction.",
+        "A brief success or error message appears after submitting the interaction."
+      ]
+    },
+    {
+      "name": "ThemeSelector",
+      "type": "component",
+      "route": "N/A",
+      "summaryDescriptionInLaymansTerms": "This small tool allows you to change the visual look of the application, such as switching between a light or dark color scheme.",
+      "detailedUserActions": [
+        "Click a button or icon to open the options for choosing a theme.",
+        "Click on a specific theme option (e.g., 'Light Mode', 'Dark Mode') to apply it to the application."
+      ],
+      "visibleElements": [
+        "A button or icon that, when clicked, reveals theme options.",
+        "A pop-up or dropdown menu listing available themes (e.g., 'Light', 'Dark', 'System')."
+      ],
+      "conditionalStates": [
+        "The theme options appear when you click the selector and close once you make a choice or click away.",
+        "The application's appearance changes instantly to the selected theme."
+      ]
+    }
+  ]
+}

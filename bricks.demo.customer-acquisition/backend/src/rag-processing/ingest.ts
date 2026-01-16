@@ -3,8 +3,11 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { ChatbotFriendlyDoc } from './types';
+import * as dotenv from "dotenv";
+dotenv.config();
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
 
 class GeminiEmbeddingFunction {
   async generate(texts: string[]): Promise<number[][]> {
@@ -58,7 +61,7 @@ States: ${element.conditionalStates.join(', ')}
   }
 
   console.log(`Ingesting ${data.length} records into table: ${tableName}`);
-  
+
   const existingTableNames = await db.tableNames();
   if (existingTableNames.includes(tableName)) {
     await db.dropTable(tableName);
