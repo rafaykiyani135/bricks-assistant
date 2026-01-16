@@ -1,0 +1,318 @@
+openapi: 3.0.0
+info:
+  title: Unified Backend - IR Generation & RAG Processing API
+  description: API for generating IR from codebases, transforming to simplified format, and ingesting into vector DB
+  version: 1.0.0
+servers:
+  - url: http://localhost:3001
+    description: Development server
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      tags:
+        - System
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /api/ir/frontend:
+    post:
+      summary: Generate Frontend IR
+      description: Analyzes a frontend codebase and generates structured IR (Intermediate Representation)
+      tags:
+        - IR Generation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - directory
+              properties:
+                directory:
+                  type: string
+                  description: Absolute path to frontend source directory
+                  example: C:/projects/my-app/client/src
+      responses:
+        '200':
+          description: Frontend IR generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    type: object
+                    properties:
+                      generatedAt:
+                        type: string
+                        format: date-time
+                      directory:
+                        type: string
+                      version:
+                        type: string
+                  frontend:
+                    type: object
+                    properties:
+                      pages:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ComponentIR'
+                      components:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ComponentIR'
+        '400':
+          description: Bad request - directory path missing
+        '500':
+          description: Internal server error
+
+  /api/ir/backend:
+    post:
+      summary: Generate Backend IR
+      description: Analyzes a backend codebase (NestJS) and generates structured IR
+      tags:
+        - IR Generation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - directory
+              properties:
+                directory:
+                  type: string
+                  description: Absolute path to backend source directory
+                  example: C:/projects/my-app/server/src
+      responses:
+        '200':
+          description: Backend IR generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    type: object
+                    properties:
+                      generatedAt:
+                        type: string
+                        format: date-time
+                      directory:
+                        type: string
+                      version:
+                        type: string
+                  backend:
+                    type: object
+                    properties:
+                      controllers:
+                        type: array
+                        items:
+                          type: object
+                      services:
+                        type: array
+                        items:
+                          type: object
+                      modules:
+                        type: array
+                        items:
+                          type: object
+                      dtos:
+                        type: array
+                        items:
+                          type: object
+        '400':
+          description: Bad request - directory path missing
+        '500':
+          description: Internal server error
+
+  /api/transform/frontend:
+    post:
+      summary: Transform Frontend IR to Simplified Format
+      description: Uses LLM to transform technical IR into layman-friendly descriptions
+      tags:
+        - Transformation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - frontend
+              properties:
+                metadata:
+                  type: object
+                  properties:
+                    generatedAt:
+                      type: string
+                      format: date-time
+                    directory:
+                      type: string
+                    version:
+                      type: string
+                frontend:
+                  type: object
+                  properties:
+                    pages:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ComponentIR'
+                    components:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ComponentIR'
+      responses:
+        '200':
+          description: IR transformed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimplifiedIR'
+        '400':
+          description: Bad request - IR missing or invalid
+        '500':
+          description: Internal server error
+
+  /api/ingest:
+    post:
+      summary: Ingest Simplified IR into Vector DB
+      description: Chunks and stores simplified IR in LanceDB with embeddings
+      tags:
+        - Ingestion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - simplifiedIR
+              properties:
+                simplifiedIR:
+                  $ref: '#/components/schemas/SimplifiedIR'
+                tableName:
+                  type: string
+                  description: Name of the LanceDB table
+                  default: frontend_knowledge_base_v1
+                  example: frontend_knowledge_base_v1
+      responses:
+        '200':
+          description: Data ingested successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Successfully ingested 10 elements into frontend_knowledge_base_v1
+                  tableName:
+                    type: string
+                    example: frontend_knowledge_base_v1
+        '400':
+          description: Bad request - simplified IR missing or invalid
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    ComponentIR:
+      type: object
+      properties:
+        name:
+          type: string
+          example: LoginPage
+        file:
+          type: string
+          example: pages/login.vue
+        type:
+          type: string
+          enum: [page, component, layout]
+          example: page
+        route:
+          type: string
+          example: /login
+        labels:
+          type: array
+          items:
+            type: object
+        actions:
+          type: array
+          items:
+            type: object
+        formFields:
+          type: array
+          items:
+            type: object
+        disabledStates:
+          type: array
+          items:
+            type: object
+        apiCalls:
+          type: array
+          items:
+            type: object
+
+    SimplifiedIR:
+      type: object
+      properties:
+        elements:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: LoginPage
+              type:
+                type: string
+                example: page
+              route:
+                type: string
+                example: /login
+              summaryDescriptionInLaymansTerms:
+                type: string
+                example: This is the login page where users enter their credentials
+              detailedUserActions:
+                type: array
+                items:
+                  type: string
+                example:
+                  - Enter username in the text field
+                  - Enter password in the password field
+                  - Click the Login button to submit
+              visibleElements:
+                type: array
+                items:
+                  type: string
+                example:
+                  - Username input field
+                  - Password input field
+                  - Login button
+              conditionalStates:
+                type: array
+                items:
+                  type: string
+                example:
+                  - Login button is disabled while processing
+                  - Error message appears if credentials are invalid
