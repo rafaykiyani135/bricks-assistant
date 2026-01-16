@@ -25,8 +25,17 @@ const embedder = new GeminiEmbeddingFunction();
 
 export async function ingestToLanceDB(
   doc: ChatbotFriendlyDoc,
-  tableName: string = 'frontend_knowledge_base_v1'
+  tableName?: string // Table name is now optional
 ) {
+  // Auto-detect default table name based on content
+  let targetTable = tableName;
+  if (!targetTable) {
+    if (doc.elements.some(e => 'technicalDetails' in e)) {
+      targetTable = 'backend_knowledge_base_v1';
+    } else {
+      targetTable = 'frontend_knowledge_base_v1';
+    }
+  }
   const dbDir = path.resolve(__dirname, '../../lancedb_data');
   if (!fs.existsSync(dbDir)) {
     fs.mkdirSync(dbDir, { recursive: true });
@@ -82,13 +91,13 @@ States: ${fe.conditionalStates.join(', ')}
     });
   }
 
-  console.log(`Ingesting ${data.length} records into table: ${tableName}`);
+  console.log(`Ingesting ${data.length} records into table: ${targetTable}`);
 
   const existingTableNames = await db.tableNames();
-  if (existingTableNames.includes(tableName)) {
-    await db.dropTable(tableName);
+  if (existingTableNames.includes(targetTable!)) {
+    await db.dropTable(targetTable!);
   }
 
-  await db.createTable(tableName, data);
-  console.log(`Successfully ingested into LanceDB table: ${tableName}`);
+  await db.createTable(targetTable!, data);
+  console.log(`Successfully ingested into LanceDB table: ${targetTable}`);
 }

@@ -284,7 +284,7 @@ paths:
   /api/query:
     post:
       summary: Query the Knowledge Base
-      description: Performs semantic search and generates an answer using Gemini
+      description: Performs semantic search and generates an answer using LLAMA
       tags:
         - Query
       requestBody:

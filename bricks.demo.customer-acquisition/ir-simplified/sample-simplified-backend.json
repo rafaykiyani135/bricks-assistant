@@ -1,0 +1,424 @@
+{
+    "elements": [
+        {
+            "name": "AppModule",
+            "type": "module",
+            "summary": "This is the root module of the application, responsible for bootstrapping the entire NestJS application. It integrates core functionalities such as database connectivity (TypeOrm), the GraphQL API, and the authentication system, serving as the main entry point and orchestrator.",
+            "technicalDetails": [
+                "AppController"
+            ],
+            "dependencies": [
+                "TypeOrmModule",
+                "GqlModule",
+                "AuthModule"
+            ]
+        },
+        {
+            "name": "AuthModule",
+            "type": "module",
+            "summary": "This module handles all authentication and authorization logic for the application. It provides services for user authentication, potentially including third-party providers like Google, and interacts with employee data for user validation.",
+            "technicalDetails": [
+                "AuthController",
+                "AuthService",
+                "GoogleStrategy"
+            ],
+            "dependencies": [
+                "EmployeesModule"
+            ]
+        },
+        {
+            "name": "ContactPointsModule",
+            "type": "module",
+            "summary": "This module manages data and operations related to 'contact points,' which are likely channels or methods through which interactions occur (e.g., email, phone). It provides services for data management, GraphQL resolution for client queries, and a data loader for efficient fetching, integrating with interaction summaries.",
+            "technicalDetails": [
+                "ContactPointsService",
+                "ContactPointsResolver",
+                "ContactPointsLoader"
+            ],
+            "dependencies": [
+                "TypeOrmModule",
+                "InteractionSummariesModule"
+            ]
+        },
+        {
+            "name": "CustomersModule",
+            "type": "module",
+            "summary": "This module is dedicated to managing all aspects of customer data and operations. It provides services for CRUD (Create, Read, Update, Delete) operations on customer records and exposes these functionalities via GraphQL resolvers for API access.",
+            "technicalDetails": [
+                "CustomersService",
+                "CustomersResolver"
+            ],
+            "dependencies": [
+                "TypeOrmModule"
+            ]
+        },
+        {
+            "name": "EmployeesModule",
+            "type": "module",
+            "summary": "This module handles the management of employee-related data and functionalities. It offers services for manipulating employee information and GraphQL resolvers for querying and updating employee records, making its core service reusable by other modules.",
+            "technicalDetails": [
+                "EmployeesService",
+                "EmployeesResolver"
+            ],
+            "dependencies": [
+                "TypeOrmModule"
+            ]
+        },
+        {
+            "name": "GqlModule",
+            "type": "module",
+            "summary": "This module acts as the central hub for the GraphQL API. It consolidates various domain-specific modules (like Customers, Employees, ContactPoints, InteractionSummaries) under a single GraphQL endpoint, creating a unified schema and API for clients.",
+            "technicalDetails": [],
+            "dependencies": [
+                "GraphQLModule",
+                "HelloModule",
+                "CustomersModule",
+                "ContactPointsModule",
+                "EmployeesModule",
+                "InteractionSummariesModule"
+            ]
+        },
+        {
+            "name": "HelloModule",
+            "type": "module",
+            "summary": "This appears to be a basic or introductory module, likely used for testing or demonstrating simple functionality. It provides a basic 'hello' endpoint or service through GraphQL.",
+            "technicalDetails": [
+                "HelloResolver",
+                "HelloService"
+            ],
+            "dependencies": [
+                "TypeOrmModule"
+            ]
+        },
+        {
+            "name": "InteractionSummariesModule",
+            "type": "module",
+            "summary": "This module focuses on managing and providing summaries of various interactions within the system (e.g., customer service interactions). It includes services for data handling, GraphQL resolvers for API exposure, and a data loader for efficient retrieval of interaction summary data.",
+            "technicalDetails": [
+                "InteractionSummariesService",
+                "InteractionSummariesResolver",
+                "InteractionSummariesLoader"
+            ],
+            "dependencies": [
+                "TypeOrmModule"
+            ]
+        },
+        {
+            "name": "AppController",
+            "type": "controller",
+            "summary": "This is a basic controller that typically handles the root endpoint of the application, often used for health checks or a default welcome message.",
+            "technicalDetails": [
+                "GET / - Returns a simple greeting or status message."
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "AuthController",
+            "type": "controller",
+            "summary": "This controller manages user authentication flows, including Google OAuth integration, session management, and token refresh mechanisms.",
+            "technicalDetails": [
+                "GET /auth/google - Initiates the Google OAuth login process.",
+                "GET /auth/google/callback - Handles the callback from Google OAuth, completes the user login, sets a session cookie, and redirects the user.",
+                "GET /auth/me - Retrieves the profile information or authentication state of the currently logged-in user.",
+                "GET /auth/refresh - Refreshes the user's access token using a provided refresh token.",
+                "POST /auth/logout - Logs out the user by clearing their session cookie."
+            ],
+            "dependencies": [
+                "AuthService"
+            ]
+        },
+        {
+            "name": "ContactPointsResolver",
+            "type": "resolver",
+            "summary": "This GraphQL resolver handles operations related to contact points, allowing for their creation, updates, and deletion. It also resolves associated customer and interaction data for a given contact point.",
+            "technicalDetails": [
+                "Mutation createContactPoint - Creates a new contact point record.",
+                "Mutation updateContactPoint - Updates an existing contact point identified by its ID.",
+                "Mutation deleteContactPoint - Deletes a contact point by its ID.",
+                "ResolveField customer for ContactPoint - Resolves and returns the customer associated with a specific contact point.",
+                "ResolveField interactions for ContactPoint - Resolves and returns a summary of interactions related to a specific contact point."
+            ],
+            "dependencies": [
+                "ContactPointsService",
+                "CustomersService",
+                "InteractionSummariesLoader"
+            ]
+        },
+        {
+            "name": "CustomersResolver",
+            "type": "resolver",
+            "summary": "This GraphQL resolver provides comprehensive management of customer data, enabling queries for single customers or lists, and mutations for creating, updating, or deleting customer records. It also enriches customer data with related contact points, last interaction details, and total interaction counts.",
+            "technicalDetails": [
+                "Query customer - Retrieves a single customer record by ID.",
+                "Query customers - Retrieves a list of all customer records.",
+                "Mutation createCustomer - Creates a new customer record.",
+                "Mutation updateCustomer - Updates an existing customer record identified by its ID.",
+                "Mutation deleteCustomer - Deletes a customer record by its ID.",
+                "ResolveField contactPoints for Customer - Resolves and returns all contact points associated with a specific customer.",
+                "ResolveField lastInteraction for Customer - Determines and returns the most recent interaction associated with a customer through their contact points.",
+                "ResolveField interactionCount for Customer - Calculates and returns the total number of interactions for a customer across all their contact points."
+            ],
+            "dependencies": [
+                "CustomersService",
+                "ContactPointsLoader",
+                "InteractionSummariesLoader"
+            ]
+        },
+        {
+            "name": "EmployeesResolver",
+            "type": "resolver",
+            "summary": "This GraphQL resolver manages employee information, offering queries to fetch individual employees or lists, and mutations to create or update employee records. It also includes a placeholder for resolving employee interactions.",
+            "technicalDetails": [
+                "Query employee - Retrieves a single employee record by ID.",
+                "Query employees - Retrieves a list of all employee records.",
+                "Mutation createEmployee - Creates a new employee record.",
+                "Mutation updateEmployee - Updates an existing employee record identified by its ID.",
+                "ResolveField interactions for Employee - A placeholder field to resolve interactions related to a specific employee."
+            ],
+            "dependencies": [
+                "EmployeesService"
+            ]
+        },
+        {
+            "name": "HelloResolver",
+            "type": "resolver",
+            "summary": "A simple GraphQL resolver providing a basic 'hello world' query, primarily used for testing or demonstration purposes.",
+            "technicalDetails": [
+                "Query getHello - Returns a simple greeting message."
+            ],
+            "dependencies": [
+                "HelloService"
+            ]
+        },
+        {
+            "name": "InteractionSummariesResolver",
+            "type": "resolver",
+            "summary": "This GraphQL resolver is responsible for managing interaction summaries, including the creation of new summaries and formatting specific fields like the interaction date.",
+            "technicalDetails": [
+                "Mutation createInteractionSummary - Creates a new interaction summary record.",
+                "ResolveField date for InteractionSummary - Formats and returns the date field of an interaction summary."
+            ],
+            "dependencies": [
+                "InteractionSummariesService"
+            ]
+        },
+        {
+            "name": "AuthService",
+            "type": "service",
+            "summary": "This service manages user authentication within the application. It handles user logins, specifically via Google accounts, refreshes access tokens to maintain user sessions, and provides information about the current authenticated user's state.",
+            "technicalDetails": [
+                "handleGoogleLogin - Processes a Google user's login, either finding an existing employee or creating a new one, then issues a JSON Web Token (JWT).",
+                "refreshAccessToken - Verifies a refresh token and generates a new access token to extend a user's session.",
+                "getAuthState - Validates an access token and retrieves the details of the associated employee, indicating the current authentication status."
+            ],
+            "dependencies": [
+                "EmployeesService"
+            ]
+        },
+        {
+            "name": "GoogleStrategy",
+            "type": "service",
+            "summary": "This service acts as a Passport.js strategy for authenticating users through Google. It defines how the application validates and processes a user's profile after a successful Google login.",
+            "technicalDetails": [
+                "validate - A callback function executed after successful Google authentication, processing the user's Google profile and preparing it for the application's internal use."
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "GqlAuthGuard",
+            "type": "service",
+            "summary": "This service functions as a guard for GraphQL endpoints, ensuring that only authenticated requests can access protected resources. It validates the presence and integrity of a JSON Web Token (JWT) in the request header.",
+            "technicalDetails": [
+                "canActivate - Determines if a GraphQL request is authorized by extracting and verifying a JWT from the authorization header, returning true for valid tokens and false otherwise."
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "ContactPointsLoader",
+            "type": "service",
+            "summary": "This service is a data loader optimized for fetching 'Contact Points'. It efficiently retrieves multiple contact points, typically by customer ID, by batching database requests to prevent performance issues like the N+1 problem in GraphQL.",
+            "technicalDetails": [
+                "load - Retrieves contact points for a given customer ID, leveraging an internal DataLoader instance to batch and optimize data fetching operations."
+            ],
+            "dependencies": [
+                "ContactPointsService"
+            ]
+        },
+        {
+            "name": "ContactPointsService",
+            "type": "service",
+            "summary": "This service manages all operations related to 'Contact Points', which represent individual points of contact for customers (e.g., a specific person or department). It allows for creating, retrieving, updating, and deleting these contact points, ensuring uniqueness by name and email for a given customer.",
+            "technicalDetails": [
+                "findByCustomerId - Retrieves all contact points associated with a specific customer ID.",
+                "findByCustomerIds - Retrieves and groups contact points for a list of customer IDs.",
+                "findByNameAndCustomerId - Finds a single contact point by its name and the associated customer ID.",
+                "findByEmailAndCustomerId - Finds a single contact point by its email address and the associated customer ID.",
+                "create - Creates a new contact point, performing checks to ensure its name and email are unique within the context of the customer.",
+                "update - Updates an existing contact point identified by its ID, also verifying uniqueness constraints for name and email.",
+                "delete - Removes a contact point from the system based on its ID."
+            ],
+            "dependencies": [
+                "Repository<ContactPoint>"
+            ]
+        },
+        {
+            "name": "CustomersService",
+            "type": "service",
+            "summary": "This service handles all core business logic for 'Customers'. It provides functionalities to manage customer records, including retrieving lists of customers, finding specific customers, and performing CRUD (Create, Read, Update, Delete) operations, with uniqueness checks for customer names.",
+            "technicalDetails": [
+                "findAll - Retrieves all customer records in the database.",
+                "findOne - Retrieves a single customer record by its unique identifier (ID).",
+                "findByName - Finds a customer record by their name, performing a case-insensitive search.",
+                "create - Creates a new customer record, ensuring that the provided customer name is unique.",
+                "update - Updates an existing customer record, verifying that the new customer name (if changed) remains unique.",
+                "delete - Removes a customer record from the system based on its ID."
+            ],
+            "dependencies": [
+                "Repository<Customer>"
+            ]
+        },
+        {
+            "name": "EmployeesService",
+            "type": "service",
+            "summary": "This service manages employee records within the system. It allows for the retrieval of employee data, as well as the creation and modification of employee profiles, likely linking to internal users of the application.",
+            "technicalDetails": [
+                "findAll - Retrieves all employee records.",
+                "findOne - Retrieves a single employee record by their unique identifier (ID).",
+                "findByEmail - Finds an employee record by their email address.",
+                "create - Creates a new employee record in the system.",
+                "update - Updates an existing employee record."
+            ],
+            "dependencies": [
+                "Repository<Employee>"
+            ]
+        },
+        {
+            "name": "HelloService",
+            "type": "service",
+            "summary": "This service appears to be a basic, potentially placeholder or example service. Its primary function is to provide a simple 'hello' greeting, possibly by fetching a 'Hello' entity from the database.",
+            "technicalDetails": [
+                "getHello - Retrieves a 'Hello' entity based on a provided name, likely to generate a greeting message."
+            ],
+            "dependencies": [
+                "Repository<Hello>"
+            ]
+        },
+        {
+            "name": "InteractionSummariesLoader",
+            "type": "service",
+            "summary": "This service is a data loader designed for efficient retrieval of 'Interaction Summaries'. It optimizes fetching multiple summaries, typically linked to various contact points, by batching database queries to avoid the N+1 problem, especially in GraphQL contexts.",
+            "technicalDetails": [
+                "load - Retrieves interaction summaries for a given contact point ID, utilizing an internal DataLoader instance to batch and optimize data fetching."
+            ],
+            "dependencies": [
+                "InteractionSummariesService"
+            ]
+        },
+        {
+            "name": "InteractionSummariesService",
+            "type": "service",
+            "summary": "This service manages 'Interaction Summaries', which are records detailing communications or engagements with specific contact points. It facilitates the creation of new summaries and their retrieval for one or multiple contact points, helping track communication history.",
+            "technicalDetails": [
+                "create - Creates a new interaction summary record, associating it with a specific employee and input details.",
+                "findByContactPointId - Retrieves all interaction summaries linked to a single contact point ID.",
+                "findByContactPointIds - Retrieves and groups interaction summaries for a list of contact point IDs."
+            ],
+            "dependencies": [
+                "Repository<InteractionSummary>"
+            ]
+        },
+        {
+            "name": "CreateContactPointInput",
+            "type": "dto",
+            "summary": "Represents the data required to create a new contact point for a customer.",
+            "technicalDetails": [
+                "customerId (string, required): The unique identifier of the customer this contact point belongs to.",
+                "name (string, required): The name of the contact point.",
+                "role (string, optional): The role or position of the contact point.",
+                "email (string, optional): The email address of the contact point.",
+                "phone (string, optional): The phone number of the contact point.",
+                "override (boolean, optional): Flag indicating whether to override existing data if a conflict is found."
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "UpdateContactPointInput",
+            "type": "dto",
+            "summary": "Represents the data required to update an existing contact point.",
+            "technicalDetails": [
+                "id (string, required): The unique identifier of the contact point to be updated.",
+                "name (string, optional): The updated name of the contact point.",
+                "role (string, optional): The updated role or position of the contact point.",
+                "email (string, optional): The updated email address of the contact point.",
+                "phone (string, optional): The updated phone number of the contact point."
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "CreateCustomerInput",
+            "type": "dto",
+            "summary": "Represents the data required to create a new customer.",
+            "technicalDetails": [
+                "name (string, required): The name of the customer.",
+                "industry (string, optional): The industry the customer operates in.",
+                "website (string, optional): The official website of the customer.",
+                "override (boolean, optional): Flag indicating whether to override existing data if a conflict is found."
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "UpdateCustomerInput",
+            "type": "dto",
+            "summary": "Represents the data required to update an existing customer.",
+            "technicalDetails": [
+                "id (string, required): The unique identifier of the customer to be updated.",
+                "name (string, optional): The updated name of the customer.",
+                "industry (string, optional): The updated industry of the customer.",
+                "website (string, optional): The updated official website of the customer."
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "CreateEmployeeInput",
+            "type": "dto",
+            "summary": "Represents the data required to create a new employee.",
+            "technicalDetails": [
+                "name (string, required): The full name of the employee.",
+                "email (string, required): The email address of the employee, which should be unique."
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "UpdateEmployeeInput",
+            "type": "dto",
+            "summary": "Represents the data required to update an existing employee.",
+            "technicalDetails": [
+                "id (string, required): The unique identifier of the employee to be updated.",
+                "name (string, optional): The updated full name of the employee.",
+                "email (string, optional): The updated email address of the employee."
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "HelloQuery",
+            "type": "dto",
+            "summary": "Represents a query parameter for a simple 'hello' endpoint, typically used for testing or greetings.",
+            "technicalDetails": [
+                "message (string, required): A string message to be processed or returned by the 'hello' endpoint."
+            ],
+            "dependencies": []
+        },
+        {
+            "name": "CreateInteractionSummaryInput",
+            "type": "dto",
+            "summary": "Represents the data required to create a new summary of an interaction with a contact point.",
+            "technicalDetails": [
+                "contactPointId (string, required): The unique identifier of the contact point involved in the interaction.",
+                "date (string, required): The date of the interaction (e.g., in ISO 8601 format).",
+                "type (string, required): The type of interaction (e.g., 'call', 'email', 'meeting').",
+                "message (string, required): A detailed summary or description of the interaction."
+            ],
+            "dependencies": []
+        }
+    ]
+}
