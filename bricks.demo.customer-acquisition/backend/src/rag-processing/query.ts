@@ -29,6 +29,48 @@ export interface QueryResult {
     context: any[];
 }
 
+export async function classifyIntent(query: string): Promise<'FRONTEND' | 'BACKEND'> {
+    const prompt = `
+You are an intent classifier for a software documentation assistant.
+
+Your job is to decide whether a user's question requires information from:
+- FRONTEND documentation (UI, screens, buttons, user flows, interactions)
+- BACKEND documentation (APIs, services, controllers, database, business logic)
+
+Classification rules:
+- Choose FRONTEND if the answer depends on how a user interacts with the UI.
+- Choose BACKEND if the answer depends on server-side logic, APIs, or data handling.
+- Choose FRONTEND if the question mentions steps a user performs in the app.
+- Choose BACKEND if the question mentions requests, responses, validation, or persistence.
+- If the question involves both, choose the one that is more essential to answer the question.
+
+Output format:
+Return ONLY one word: FRONTEND or BACKEND.
+Do not explain your reasoning.
+
+USER QUESTION: "${query}"
+`;
+
+    try {
+        const chatCompletion = await groq.chat.completions.create({
+            messages: [{ role: "user", content: prompt }],
+            model: "llama-3.3-70b-versatile",
+            temperature: 0,
+            max_tokens: 10,
+        });
+
+        const intent = chatCompletion.choices[0]?.message?.content?.trim().toUpperCase() || 'BACKEND';
+
+        // Safety check to ensure we only return valid intents
+        if (intent.includes('FRONTEND')) return 'FRONTEND';
+        return 'BACKEND';
+
+    } catch (error) {
+        console.error("Error classifying intent:", error);
+        return 'BACKEND'; // Default safely
+    }
+}
+
 export async function queryKnowledgeBase(query: string, tableName: string = 'frontend_knowledge_base_v1'): Promise<QueryResult> {
     const dbDir = path.resolve(__dirname, '../../lancedb_data');
     if (!fs.existsSync(dbDir)) {

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { queryKnowledgeBase } from '../rag-processing/query';
+import { queryKnowledgeBase, classifyIntent } from '../rag-processing/query';
 
 export async function queryKB(req: Request, res: Response) {
     try {
@@ -15,8 +15,21 @@ export async function queryKB(req: Request, res: Response) {
         // I'll default to 'frontend_knowledge_base_v1' as per the function default, 
         // but the user can override it.
 
-        console.log(`Processing query: "${query}" on table: ${tableName || 'default'}`);
-        const result = await queryKnowledgeBase(query, tableName);
+        console.log(`Processing query: "${query}"`);
+
+        let targetTable = tableName;
+
+        // If no tableName is provided, use AI to classify intent
+        if (!targetTable) {
+            console.log('🤖 No table specified. Auto-detecting intent...');
+            const intent = await classifyIntent(query);
+            targetTable = intent === 'FRONTEND' ? 'frontend_knowledge_base_v1' : 'backend_knowledge_base_v1';
+            console.log(`🎯 Detected Intent: ${intent} -> Using table: ${targetTable}`);
+        } else {
+            console.log(`ℹ️ Using specified table: ${targetTable}`);
+        }
+
+        const result = await queryKnowledgeBase(query, targetTable);
 
         res.json(result);
     } catch (error: any) {
