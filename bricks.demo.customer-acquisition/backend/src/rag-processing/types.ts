@@ -8,6 +8,12 @@ export interface ComponentIR {
   formFields: any[];
   disabledStates: any[];
   apiCalls: any[];
+  functions: any[];
+  computed?: any[];
+  dataFlow?: any[];
+  uiStates?: any[];
+  entities?: any[];
+  rules?: any[];
 }
 
 export interface FrontendIR {
@@ -36,6 +42,8 @@ export interface FrontendTransformedElement {
   detailedUserActions: string[];
   visibleElements: string[];
   conditionalStates: string[];
+  dataProvenance?: string[];
+  businessLogic?: string[];
 }
 
 export interface BackendTransformedElement {

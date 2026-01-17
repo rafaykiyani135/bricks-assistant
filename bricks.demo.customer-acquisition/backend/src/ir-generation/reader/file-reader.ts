@@ -129,28 +129,47 @@ export function findFrontendFiles(directory: string): {
     const vueFiles = findVueFiles(directory);
     const tsFiles = findTypeScriptFiles(directory);
 
-    // Separate stores and composables based on content or directory
-    const storeFiles = tsFiles.filter((f) => {
-        const path = f.relativePath.replace(/\\/g, '/');
-        // Folder check
-        if (path.includes('/stores/') || path.startsWith('stores/')) return true;
-        
-        // Content check (Pinia or Vuex)
-        return f.content.includes('defineStore') || f.content.includes('createStore');
-    });
+    const storeFiles: ParsedFile[] = [];
+    const composableFiles: ParsedFile[] = [];
 
-    const composableFiles = tsFiles.filter((f) => {
+    for (const f of tsFiles) {
         const path = f.relativePath.replace(/\\/g, '/');
-        // Folder check
-        if (path.includes('/composables/') || path.startsWith('composables/')) return true;
-        
-        // Content check (start with useX and exports functions)
-        const fileName = getFileName(f.relativePath);
-        if (fileName.startsWith('use')) {
-             return f.content.includes('export function') || f.content.includes('export const');
+        const content = f.content;
+
+        // Debug logging
+        // console.log(`Checking TS file: ${path}`);
+
+        // 1. Check for Stores (Pinia/Vuex)
+        // Heuristic: defines a store or resides in a 'stores' directory
+        if (
+            path.includes('/stores/') ||
+            path.startsWith('stores/') ||
+            content.includes('defineStore') ||
+            content.includes('createStore')
+        ) {
+            storeFiles.push(f);
+            continue;
         }
-        return false;
-    });
+
+        // 2. Check for Composables / Logic
+        // Heuristic: resides in 'composables', starts with 'use', or exports functions
+        // We want to be generous here to capture utils and api clients too
+        if (
+            path.includes('/composables/') ||
+            path.startsWith('composables/') ||
+            path.includes('/utils/') ||
+            path.includes('/api/') ||
+            path.includes('/middleware/') ||
+            path.startsWith('middleware/') ||
+            path.includes('/plugins/') ||
+            path.startsWith('plugins/') ||
+            getFileName(path).startsWith('use') ||
+            (content.includes('export function') || content.includes('export const') || content.includes('export default'))
+        ) {
+            composableFiles.push(f);
+            continue;
+        }
+    }
 
     return { vueFiles, storeFiles, composableFiles };
 }
@@ -191,14 +210,30 @@ export function classifyFrontendFile(
     filePath: string
 ): 'page' | 'component' | 'store' | 'composable' | 'layout' | 'plugin' | 'middleware' | 'unknown' {
     const normalizedPath = filePath.replace(/\\/g, '/').toLowerCase();
+    const fileName = getFileName(filePath).toLowerCase();
 
-    if (normalizedPath.includes('/pages/')) return 'page';
-    if (normalizedPath.includes('/components/')) return 'component';
-    if (normalizedPath.includes('/stores/')) return 'store';
-    if (normalizedPath.includes('/composables/')) return 'composable';
+    // Specific folder checks (Strong signals)
+    if (normalizedPath.includes('/pages/') || normalizedPath.includes('/views/')) return 'page';
     if (normalizedPath.includes('/layouts/')) return 'layout';
     if (normalizedPath.includes('/plugins/')) return 'plugin';
     if (normalizedPath.includes('/middleware/')) return 'middleware';
+
+    // Stores
+    if (normalizedPath.includes('/stores/') || fileName.includes('.store.')) return 'store';
+
+    // Composables
+    if (normalizedPath.includes('/composables/') || fileName.startsWith('use')) return 'composable';
+
+    // Fallbacks based on extension
+    if (fileName.endsWith('.vue')) {
+        // If it's a Vue file and not a page/layout, it's a component
+        return 'component';
+    }
+
+    if (fileName.endsWith('.ts')) {
+        // Default generic TS files in frontend to composable (logic containers)
+        return 'composable';
+    }
 
     return 'unknown';
 }

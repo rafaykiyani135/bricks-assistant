@@ -30,6 +30,12 @@ import {
     extractUIActions,
     extractFormFields,
     extractDisabledStates,
+    extractConstants,
+    extractComputedMetadata,
+    extractDataFlows,
+    extractUIStates,
+    extractEntities,
+    extractBusinessRules,
 } from '../parser/vue-parser';
 import { ParsedFile } from '../types/ir.types';
 
@@ -78,6 +84,8 @@ export function extractComponent(file: ParsedFile): ExtractionResult<ComponentIR
         name: f.name,
         isAsync: f.isAsync,
         calls: f.calls,
+        type: f.type,
+        codeSnippet: f.codeSnippet,
     }));
 
     // Extract UI elements from template
@@ -111,6 +119,16 @@ export function extractComponent(file: ParsedFile): ExtractionResult<ComponentIR
         condition: d.condition,
     }));
 
+    // Extract constants (new)
+    const constants = extractConstants(vueFile.scriptContent);
+
+    // Advanced structural sections
+    const computed = extractComputedMetadata(vueFile.scriptContent);
+    const dataFlow = extractDataFlows(vueFile.scriptContent);
+    const uiStates = extractUIStates(vueFile.scriptContent);
+    const entities = extractEntities(vueFile.scriptContent);
+    const rules = extractBusinessRules(vueFile.scriptContent);
+
     components.push({
         name,
         file: file.relativePath,
@@ -127,6 +145,12 @@ export function extractComponent(file: ParsedFile): ExtractionResult<ComponentIR
         actions,
         formFields,
         disabledStates,
+        constants,
+        computed,
+        dataFlow,
+        uiStates,
+        entities,
+        rules,
     });
 
     return { items: components, filePath: file.relativePath };

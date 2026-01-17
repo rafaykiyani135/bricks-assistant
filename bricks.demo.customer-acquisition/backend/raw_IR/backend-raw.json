@@ -1,0 +1,1444 @@
+{
+  "metadata": {
+    "generatedAt": "2026-01-17T17:12:16.583Z",
+    "directory": "C:\\Users\\PAX\\bricks.demo.customer-acquisition\\server",
+    "version": "2.0.0"
+  },
+  "backend": {
+    "modules": [
+      {
+        "name": "AppModule",
+        "file": "src/app.module.ts",
+        "controllers": [
+          "AppController"
+        ],
+        "providers": [],
+        "imports": [
+          "TypeOrmModule",
+          "GqlModule",
+          "AuthModule"
+        ],
+        "exports": []
+      },
+      {
+        "name": "AuthModule",
+        "file": "src/auth/auth.module.ts",
+        "controllers": [
+          "AuthController"
+        ],
+        "providers": [
+          "AuthService",
+          "GoogleStrategy"
+        ],
+        "imports": [
+          "EmployeesModule"
+        ],
+        "exports": []
+      },
+      {
+        "name": "ContactPointsModule",
+        "file": "src/contact-points/contact-points.module.ts",
+        "controllers": [],
+        "providers": [
+          "ContactPointsService",
+          "ContactPointsResolver",
+          "ContactPointsLoader"
+        ],
+        "imports": [
+          "TypeOrmModule",
+          "InteractionSummariesModule"
+        ],
+        "exports": [
+          "ContactPointsService",
+          "ContactPointsLoader"
+        ]
+      },
+      {
+        "name": "CustomersModule",
+        "file": "src/customers/customers.module.ts",
+        "controllers": [],
+        "providers": [
+          "CustomersService",
+          "CustomersResolver"
+        ],
+        "imports": [
+          "TypeOrmModule"
+        ],
+        "exports": [
+          "CustomersService"
+        ]
+      },
+      {
+        "name": "EmployeesModule",
+        "file": "src/employees/employees.module.ts",
+        "controllers": [],
+        "providers": [
+          "EmployeesService",
+          "EmployeesResolver"
+        ],
+        "imports": [
+          "TypeOrmModule"
+        ],
+        "exports": [
+          "EmployeesService"
+        ]
+      },
+      {
+        "name": "GqlModule",
+        "file": "src/graphql/graphql.module.ts",
+        "controllers": [],
+        "providers": [],
+        "imports": [
+          "GraphQLModule",
+          "HelloModule",
+          "CustomersModule",
+          "ContactPointsModule",
+          "EmployeesModule",
+          "InteractionSummariesModule"
+        ],
+        "exports": []
+      },
+      {
+        "name": "HelloModule",
+        "file": "src/hello/hello.module.ts",
+        "controllers": [],
+        "providers": [
+          "HelloResolver",
+          "HelloService"
+        ],
+        "imports": [
+          "TypeOrmModule"
+        ],
+        "exports": []
+      },
+      {
+        "name": "InteractionSummariesModule",
+        "file": "src/interaction-summaries/interaction-summaries.module.ts",
+        "controllers": [],
+        "providers": [
+          "InteractionSummariesService",
+          "InteractionSummariesResolver",
+          "InteractionSummariesLoader"
+        ],
+        "imports": [
+          "TypeOrmModule"
+        ],
+        "exports": [
+          "InteractionSummariesService",
+          "InteractionSummariesLoader"
+        ]
+      }
+    ],
+    "controllers": [
+      {
+        "name": "AppController",
+        "file": "src/app.controller.ts",
+        "baseRoute": null,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/",
+            "handler": "getHello",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [],
+            "returnType": "string"
+          }
+        ],
+        "injectedServices": []
+      },
+      {
+        "name": "AuthController",
+        "file": "src/auth/auth.controller.ts",
+        "baseRoute": "/auth",
+        "routes": [
+          {
+            "method": "GET",
+            "path": "google",
+            "handler": "googleLogin",
+            "params": [],
+            "guards": [
+              "AuthGuard(google)"
+            ],
+            "pipes": [],
+            "interceptors": [],
+            "calls": []
+          },
+          {
+            "method": "GET",
+            "path": "google/callback",
+            "handler": "googleCallback",
+            "params": [],
+            "guards": [
+              "AuthGuard(google)"
+            ],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "auth.handleGoogleLogin",
+              "res.cookie",
+              "res.redirect"
+            ],
+            "returnType": "Request"
+          },
+          {
+            "method": "GET",
+            "path": "me",
+            "handler": "getProfile",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "extractAccessToken",
+              "auth.getAuthState"
+            ],
+            "returnType": "Request"
+          },
+          {
+            "method": "GET",
+            "path": "refresh",
+            "handler": "refresh",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "extractRefreshToken",
+              "auth.refreshAccessToken",
+              "auth.getAuthState"
+            ],
+            "returnType": "Request"
+          },
+          {
+            "method": "POST",
+            "path": "logout",
+            "handler": "logout",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "res.clearCookie"
+            ],
+            "returnType": "Response"
+          }
+        ],
+        "injectedServices": [
+          "AuthService"
+        ]
+      },
+      {
+        "name": "ContactPointsResolver",
+        "file": "src/contact-points/contact-points.resolver.ts",
+        "baseRoute": null,
+        "routes": [
+          {
+            "method": "Mutation",
+            "path": "createContactPoint",
+            "handler": "createContactPoint",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "contactPointsService.create"
+            ],
+            "returnType": "CreateContactPointInput"
+          },
+          {
+            "method": "Mutation",
+            "path": "updateContactPoint",
+            "handler": "updateContactPoint",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "contactPointsService.update"
+            ],
+            "returnType": "UpdateContactPointInput"
+          },
+          {
+            "method": "Mutation",
+            "path": "deleteContactPoint",
+            "handler": "deleteContactPoint",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "contactPointsService.delete"
+            ],
+            "returnType": "string"
+          },
+          {
+            "method": "ResolveField",
+            "path": "customer",
+            "handler": "customer",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "customersService.findOne"
+            ],
+            "returnType": "ContactPoint"
+          },
+          {
+            "method": "ResolveField",
+            "path": "interactions",
+            "handler": "getInteractions",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "interactionSummariesLoader.load"
+            ],
+            "returnType": "ContactPoint"
+          }
+        ],
+        "injectedServices": [
+          "ContactPointsService",
+          "CustomersService",
+          "InteractionSummariesLoader"
+        ]
+      },
+      {
+        "name": "CustomersResolver",
+        "file": "src/customers/customers.resolver.ts",
+        "baseRoute": null,
+        "routes": [
+          {
+            "method": "Query",
+            "path": "customer",
+            "handler": "getCustomer",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "customersService.findOne"
+            ],
+            "returnType": "string"
+          },
+          {
+            "method": "Query",
+            "path": "customers",
+            "handler": "getCustomers",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "customersService.findAll"
+            ]
+          },
+          {
+            "method": "Mutation",
+            "path": "createCustomer",
+            "handler": "createCustomer",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "customersService.create"
+            ],
+            "returnType": "CreateCustomerInput"
+          },
+          {
+            "method": "Mutation",
+            "path": "updateCustomer",
+            "handler": "updateCustomer",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "customersService.update"
+            ],
+            "returnType": "UpdateCustomerInput"
+          },
+          {
+            "method": "Mutation",
+            "path": "deleteCustomer",
+            "handler": "deleteCustomer",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "customersService.delete"
+            ],
+            "returnType": "string"
+          },
+          {
+            "method": "ResolveField",
+            "path": "contactPoints",
+            "handler": "getContactPoints",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "contactPointsLoader.load"
+            ],
+            "returnType": "Customer"
+          },
+          {
+            "method": "ResolveField",
+            "path": "lastInteraction",
+            "handler": "lastInteraction",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "contactPointsLoader.load",
+              "contactPoints.map",
+              "Promise.all",
+              "contactPointIds.map",
+              "interactionSummariesLoader.load",
+              "allInteractions.flat",
+              "flatInteractions.reduce"
+            ],
+            "returnType": "Customer"
+          },
+          {
+            "method": "ResolveField",
+            "path": "interactionCount",
+            "handler": "interactionCount",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "contactPointsLoader.load",
+              "contactPoints.map",
+              "Promise.all",
+              "contactPointIds.map",
+              "interactionSummariesLoader.load",
+              "allInteractions.flat"
+            ],
+            "returnType": "Customer"
+          }
+        ],
+        "injectedServices": [
+          "CustomersService",
+          "ContactPointsLoader",
+          "InteractionSummariesLoader"
+        ]
+      },
+      {
+        "name": "EmployeesResolver",
+        "file": "src/employees/employees.resolver.ts",
+        "baseRoute": null,
+        "routes": [
+          {
+            "method": "Query",
+            "path": "employee",
+            "handler": "getEmployee",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "employeesService.findOne"
+            ],
+            "returnType": "string"
+          },
+          {
+            "method": "Query",
+            "path": "employees",
+            "handler": "getEmployees",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "employeesService.findAll"
+            ]
+          },
+          {
+            "method": "Mutation",
+            "path": "createEmployee",
+            "handler": "createEmployee",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "employeesService.create"
+            ],
+            "returnType": "CreateEmployeeInput"
+          },
+          {
+            "method": "Mutation",
+            "path": "updateEmployee",
+            "handler": "updateEmployee",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "employeesService.update"
+            ],
+            "returnType": "UpdateEmployeeInput"
+          },
+          {
+            "method": "ResolveField",
+            "path": "interactions",
+            "handler": "getInteractions",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "Promise.resolve"
+            ]
+          }
+        ],
+        "injectedServices": [
+          "EmployeesService"
+        ]
+      },
+      {
+        "name": "HelloResolver",
+        "file": "src/hello/hello.resolver.ts",
+        "baseRoute": null,
+        "routes": [
+          {
+            "method": "Query",
+            "path": "getHello",
+            "handler": "getHello",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "helloService.getHello"
+            ],
+            "returnType": "HelloQuery"
+          }
+        ],
+        "injectedServices": [
+          "HelloService"
+        ]
+      },
+      {
+        "name": "InteractionSummariesResolver",
+        "file": "src/interaction-summaries/interaction-summaries.resolver.ts",
+        "baseRoute": null,
+        "routes": [
+          {
+            "method": "Mutation",
+            "path": "createInteractionSummary",
+            "handler": "createInteractionSummary",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [
+              "interactionSummariesService.create"
+            ],
+            "returnType": "CreateInteractionSummaryInput"
+          },
+          {
+            "method": "ResolveField",
+            "path": "date",
+            "handler": "formatDate",
+            "params": [],
+            "guards": [],
+            "pipes": [],
+            "interceptors": [],
+            "calls": [],
+            "returnType": "InteractionSummary"
+          }
+        ],
+        "injectedServices": [
+          "InteractionSummariesService"
+        ]
+      }
+    ],
+    "services": [
+      {
+        "name": "AuthService",
+        "file": "src/auth/auth.service.ts",
+        "methods": [
+          {
+            "name": "handleGoogleLogin",
+            "params": [
+              {
+                "name": "googleUser",
+                "type": "GoogleUser"
+              }
+            ],
+            "calls": [
+              "employees.findByEmail",
+              "employees.create",
+              "jwt.sign"
+            ],
+            "isAsync": true
+          },
+          {
+            "name": "refreshAccessToken",
+            "params": [
+              {
+                "name": "refreshToken",
+                "type": "string"
+              }
+            ],
+            "calls": [
+              "jwt.verify",
+              "jwt.sign"
+            ],
+            "isAsync": false
+          },
+          {
+            "name": "getAuthState",
+            "params": [
+              {
+                "name": "accessToken",
+                "type": "string"
+              }
+            ],
+            "calls": [
+              "jwt.verify",
+              "employees.findOne"
+            ],
+            "isAsync": true
+          }
+        ],
+        "injectedDependencies": [
+          "EmployeesService"
+        ]
+      },
+      {
+        "name": "GoogleStrategy",
+        "file": "src/auth/google.strategy.ts",
+        "methods": [
+          {
+            "name": "validate",
+            "params": [
+              {
+                "name": "_accessToken",
+                "type": "string"
+              },
+              {
+                "name": "_refreshToken",
+                "type": "string"
+              },
+              {
+                "name": "profile",
+                "type": "Profile"
+              },
+              {
+                "name": "done",
+                "type": "VerifyCallback"
+              }
+            ],
+            "calls": [],
+            "isAsync": false
+          }
+        ],
+        "injectedDependencies": []
+      },
+      {
+        "name": "GqlAuthGuard",
+        "file": "src/common/guards/gql-auth.guard.ts",
+        "methods": [
+          {
+            "name": "canActivate",
+            "params": [
+              {
+                "name": "context",
+                "type": "ExecutionContext"
+              }
+            ],
+            "calls": [
+              "GqlExecutionContext.create",
+              "ctx.getContext",
+              "authHeader.replace",
+              "jwt.verify"
+            ],
+            "returnType": "boolean",
+            "isAsync": false
+          }
+        ],
+        "injectedDependencies": []
+      },
+      {
+        "name": "ContactPointsLoader",
+        "file": "src/contact-points/contact-points.loader.ts",
+        "methods": [
+          {
+            "name": "load",
+            "params": [
+              {
+                "name": "customerId",
+                "type": "string"
+              }
+            ],
+            "calls": [
+              "loader.load"
+            ],
+            "isAsync": false
+          }
+        ],
+        "injectedDependencies": [
+          "ContactPointsService"
+        ]
+      },
+      {
+        "name": "ContactPointsService",
+        "file": "src/contact-points/contact-points.service.ts",
+        "methods": [
+          {
+            "name": "findByCustomerId",
+            "params": [
+              {
+                "name": "customerId",
+                "type": "string"
+              }
+            ],
+            "calls": [
+              "contactPointsRepository.find"
+            ],
+            "returnType": "Promise<ContactPoint[]>",
+            "isAsync": true
+          },
+          {
+            "name": "findByCustomerIds",
+            "params": [
+              {
+                "name": "customerIds",
+                "type": "readonly string[]"
+              }
+            ],
+            "calls": [
+              "contactPointsRepository.find",
+              "contactPoints.reduce",
+              "push"
+            ],
+            "returnType": "Promise<Record<string, ContactPoint[]>>",
+            "isAsync": true
+          },
+          {
+            "name": "findByNameAndCustomerId",
+            "params": [
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "customerId",
+                "type": "string"
+              }
+            ],
+            "calls": [
+              "getOne",
+              "andWhere",
+              "where",
+              "contactPointsRepository.createQueryBuilder",
+              "name.trim"
+            ],
+            "returnType": "Promise<ContactPoint | null>",
+            "isAsync": true
+          },
+          {
+            "name": "findByEmailAndCustomerId",
+            "params": [
+              {
+                "name": "email",
+                "type": "string"
+              },
+              {
+                "name": "customerId",
+                "type": "string"
+              }
+            ],
+            "calls": [
+              "getOne",
+              "andWhere",
+              "where",
+              "contactPointsRepository.createQueryBuilder",
+              "email.trim"
+            ],
+            "returnType": "Promise<ContactPoint | null>",
+            "isAsync": true
+          },
+          {
+            "name": "create",
+            "params": [
+              {
+                "name": "input",
+                "type": "CreateContactPointInput"
+              }
+            ],
+            "calls": [
+              "findByEmailAndCustomerId",
+              "findByNameAndCustomerId",
+              "contactPointsRepository.save",
+              "contactPointsRepository.create"
+            ],
+            "returnType": "Promise<ContactPoint>",
+            "isAsync": true
+          },
+          {
+            "name": "update",
+            "params": [
+              {
+                "name": "input",
+                "type": "UpdateContactPointInput"
+              }
+            ],
+            "calls": [
+              "contactPointsRepository.findOneBy",
+              "findByEmailAndCustomerId",
+              "findByNameAndCustomerId",
+              "contactPointsRepository.save"
+            ],
+            "returnType": "Promise<ContactPoint>",
+            "isAsync": true
+          },
+          {
+            "name": "delete",
+            "params": [
+              {
+                "name": "id",
+                "type": "string"
+              }
+            ],
+            "calls": [
+              "contactPointsRepository.findOneBy",
+              "contactPointsRepository.remove"
+            ],
+            "returnType": "Promise<ContactPoint>",
+            "isAsync": true
+          }
+        ],
+        "injectedDependencies": [
+          "Repository<ContactPoint>"
+        ]
+      },
+      {
+        "name": "CustomersService",
+        "file": "src/customers/customers.service.ts",
+        "methods": [
+          {
+            "name": "findAll",
+            "params": [],
+            "calls": [
+              "repo.find"
+            ],
+            "returnType": "Promise<Customer[]>",
+            "isAsync": true
+          },
+          {
+            "name": "findOne",
+            "params": [
+              {
+                "name": "id",
+                "type": "string"
+              }
+            ],
+            "calls": [
+              "repo.findOneBy"
+            ],
+            "isAsync": true
+          },
+          {
+            "name": "findByName",
+            "params": [
+              {
+                "name": "name",
+                "type": "string"
+              }
+            ],
+            "calls": [
+              "getOne",
+              "where",
+              "repo.createQueryBuilder",
+              "name.trim"
+            ],
+            "returnType": "Promise<Customer | null>",
+            "isAsync": true
+          },
+          {
+            "name": "create",
+            "params": [
+              {
+                "name": "input",
+                "type": "CreateCustomerInput"
+              }
+            ],
+            "calls": [
+              "findByName",
+              "repo.save",
+              "repo.create"
+            ],
+            "isAsync": true
+          },
+          {
+            "name": "update",
+            "params": [
+              {
+                "name": "input",
+                "type": "UpdateCustomerInput"
+              }
+            ],
+            "calls": [
+              "findOne",
+              "findByName",
+              "repo.save"
+            ],
+            "isAsync": true
+          },
+          {
+            "name": "delete",
+            "params": [
+              {
+                "name": "id",
+                "type": "string"
+              }
+            ],
+            "calls": [
+              "findOne",
+              "repo.remove"
+            ],
+            "returnType": "Promise<Customer>",
+            "isAsync": true
+          }
+        ],
+        "injectedDependencies": [
+          "Repository<Customer>"
+        ]
+      },
+      {
+        "name": "EmployeesService",
+        "file": "src/employees/employees.service.ts",
+        "methods": [
+          {
+            "name": "findAll",
+            "params": [],
+            "calls": [
+              "repo.find"
+            ],
+            "isAsync": true
+          },
+          {
+            "name": "findOne",
+            "params": [
+              {
+                "name": "id",
+                "type": "string"
+              }
+            ],
+            "calls": [
+              "repo.findOneBy"
+            ],
+            "isAsync": true
+          },
+          {
+            "name": "findByEmail",
+            "params": [
+              {
+                "name": "email",
+                "type": "string"
+              }
+            ],
+            "calls": [
+              "repo.findOneBy"
+            ],
+            "isAsync": true
+          },
+          {
+            "name": "create",
+            "params": [
+              {
+                "name": "input",
+                "type": "CreateEmployeeInput"
+              }
+            ],
+            "calls": [
+              "repo.create",
+              "repo.save"
+            ],
+            "isAsync": true
+          },
+          {
+            "name": "update",
+            "params": [
+              {
+                "name": "input",
+                "type": "UpdateEmployeeInput"
+              }
+            ],
+            "calls": [
+              "findOne",
+              "repo.save"
+            ],
+            "isAsync": true
+          }
+        ],
+        "injectedDependencies": [
+          "Repository<Employee>"
+        ]
+      },
+      {
+        "name": "HelloService",
+        "file": "src/hello/hello.service.ts",
+        "methods": [
+          {
+            "name": "getHello",
+            "params": [
+              {
+                "name": "name",
+                "type": "string"
+              }
+            ],
+            "calls": [
+              "repo.findOneBy"
+            ],
+            "isAsync": true
+          }
+        ],
+        "injectedDependencies": [
+          "Repository<Hello>"
+        ]
+      },
+      {
+        "name": "InteractionSummariesLoader",
+        "file": "src/interaction-summaries/interaction-summaries.loader.ts",
+        "methods": [
+          {
+            "name": "load",
+            "params": [
+              {
+                "name": "contactPointId",
+                "type": "string"
+              }
+            ],
+            "calls": [
+              "loader.load"
+            ],
+            "isAsync": false
+          }
+        ],
+        "injectedDependencies": [
+          "InteractionSummariesService"
+        ]
+      },
+      {
+        "name": "InteractionSummariesService",
+        "file": "src/interaction-summaries/interaction-summaries.service.ts",
+        "methods": [
+          {
+            "name": "create",
+            "params": [
+              {
+                "name": "input",
+                "type": "CreateInteractionSummaryInput"
+              },
+              {
+                "name": "employeeId",
+                "type": "string"
+              }
+            ],
+            "calls": [
+              "interactionSummariesRepository.create",
+              "interactionSummariesRepository.save"
+            ],
+            "returnType": "Promise<InteractionSummary>",
+            "isAsync": true
+          },
+          {
+            "name": "findByContactPointId",
+            "params": [
+              {
+                "name": "contactPointId",
+                "type": "string"
+              }
+            ],
+            "calls": [
+              "interactionSummariesRepository.find"
+            ],
+            "returnType": "Promise<InteractionSummary[]>",
+            "isAsync": true
+          },
+          {
+            "name": "findByContactPointIds",
+            "params": [
+              {
+                "name": "contactPointIds",
+                "type": "readonly string[]"
+              }
+            ],
+            "calls": [
+              "interactionSummariesRepository.find",
+              "interactionSummaries.reduce",
+              "push"
+            ],
+            "returnType": "Promise<Record<string, InteractionSummary[]>>",
+            "isAsync": true
+          }
+        ],
+        "injectedDependencies": [
+          "Repository<InteractionSummary>"
+        ]
+      }
+    ],
+    "dtos": [
+      {
+        "name": "CreateContactPointInput",
+        "file": "src/contact-points/dto/create-contact-point.dto.ts",
+        "fields": [
+          {
+            "name": "customerId",
+            "type": "string",
+            "isOptional": false,
+            "decorators": []
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "isOptional": false,
+            "decorators": []
+          },
+          {
+            "name": "role",
+            "type": "string",
+            "isOptional": true,
+            "decorators": []
+          },
+          {
+            "name": "email",
+            "type": "string",
+            "isOptional": true,
+            "decorators": []
+          },
+          {
+            "name": "phone",
+            "type": "string",
+            "isOptional": true,
+            "decorators": []
+          },
+          {
+            "name": "override",
+            "type": "boolean",
+            "isOptional": true,
+            "decorators": []
+          }
+        ]
+      },
+      {
+        "name": "UpdateContactPointInput",
+        "file": "src/contact-points/dto/update-contact-point.dto.ts",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string",
+            "isOptional": false,
+            "decorators": []
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "isOptional": true,
+            "decorators": []
+          },
+          {
+            "name": "role",
+            "type": "string",
+            "isOptional": true,
+            "decorators": []
+          },
+          {
+            "name": "email",
+            "type": "string",
+            "isOptional": true,
+            "decorators": []
+          },
+          {
+            "name": "phone",
+            "type": "string",
+            "isOptional": true,
+            "decorators": []
+          }
+        ]
+      },
+      {
+        "name": "CreateCustomerInput",
+        "file": "src/customers/dto/create-customer.dto.ts",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string",
+            "isOptional": false,
+            "decorators": []
+          },
+          {
+            "name": "industry",
+            "type": "string",
+            "isOptional": true,
+            "decorators": []
+          },
+          {
+            "name": "website",
+            "type": "string",
+            "isOptional": true,
+            "decorators": []
+          },
+          {
+            "name": "override",
+            "type": "boolean",
+            "isOptional": true,
+            "decorators": []
+          }
+        ]
+      },
+      {
+        "name": "UpdateCustomerInput",
+        "file": "src/customers/dto/update-customer.dto.ts",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string",
+            "isOptional": false,
+            "decorators": []
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "isOptional": true,
+            "decorators": []
+          },
+          {
+            "name": "industry",
+            "type": "string",
+            "isOptional": true,
+            "decorators": []
+          },
+          {
+            "name": "website",
+            "type": "string",
+            "isOptional": true,
+            "decorators": []
+          }
+        ]
+      },
+      {
+        "name": "CreateEmployeeInput",
+        "file": "src/employees/dto/create-employee.dto.ts",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string",
+            "isOptional": false,
+            "decorators": []
+          },
+          {
+            "name": "email",
+            "type": "string",
+            "isOptional": false,
+            "decorators": []
+          }
+        ]
+      },
+      {
+        "name": "UpdateEmployeeInput",
+        "file": "src/employees/dto/update-employee.dto.ts",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string",
+            "isOptional": false,
+            "decorators": []
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "isOptional": true,
+            "decorators": []
+          },
+          {
+            "name": "email",
+            "type": "string",
+            "isOptional": true,
+            "decorators": []
+          }
+        ]
+      },
+      {
+        "name": "HelloQuery",
+        "file": "src/hello/hello.model.ts",
+        "fields": [
+          {
+            "name": "message",
+            "type": "string",
+            "isOptional": false,
+            "decorators": []
+          }
+        ]
+      },
+      {
+        "name": "CreateInteractionSummaryInput",
+        "file": "src/interaction-summaries/dto/create-interaction-summary.dto.ts",
+        "fields": [
+          {
+            "name": "contactPointId",
+            "type": "string",
+            "isOptional": false,
+            "decorators": []
+          },
+          {
+            "name": "date",
+            "type": "string",
+            "isOptional": false,
+            "decorators": []
+          },
+          {
+            "name": "type",
+            "type": "string",
+            "isOptional": false,
+            "decorators": []
+          },
+          {
+            "name": "message",
+            "type": "string",
+            "isOptional": false,
+            "decorators": []
+          }
+        ]
+      }
+    ],
+    "relationships": {
+      "controllerToService": [
+        {
+          "controller": "AuthController",
+          "service": "AuthService"
+        },
+        {
+          "controller": "ContactPointsResolver",
+          "service": "ContactPointsService"
+        },
+        {
+          "controller": "ContactPointsResolver",
+          "service": "CustomersService"
+        },
+        {
+          "controller": "ContactPointsResolver",
+          "service": "InteractionSummariesLoader"
+        },
+        {
+          "controller": "CustomersResolver",
+          "service": "CustomersService"
+        },
+        {
+          "controller": "CustomersResolver",
+          "service": "ContactPointsLoader"
+        },
+        {
+          "controller": "CustomersResolver",
+          "service": "InteractionSummariesLoader"
+        },
+        {
+          "controller": "EmployeesResolver",
+          "service": "EmployeesService"
+        },
+        {
+          "controller": "HelloResolver",
+          "service": "HelloService"
+        },
+        {
+          "controller": "InteractionSummariesResolver",
+          "service": "InteractionSummariesService"
+        }
+      ],
+      "serviceToService": [
+        {
+          "fromService": "AuthService",
+          "toService": "EmployeesService"
+        },
+        {
+          "fromService": "ContactPointsLoader",
+          "toService": "ContactPointsService"
+        },
+        {
+          "fromService": "InteractionSummariesLoader",
+          "toService": "InteractionSummariesService"
+        }
+      ],
+      "moduleBindings": [
+        {
+          "module": "AppModule",
+          "controllers": [
+            "AppController"
+          ],
+          "providers": []
+        },
+        {
+          "module": "AuthModule",
+          "controllers": [
+            "AuthController"
+          ],
+          "providers": [
+            "AuthService",
+            "GoogleStrategy"
+          ]
+        },
+        {
+          "module": "ContactPointsModule",
+          "controllers": [],
+          "providers": [
+            "ContactPointsService",
+            "ContactPointsResolver",
+            "ContactPointsLoader"
+          ]
+        },
+        {
+          "module": "CustomersModule",
+          "controllers": [],
+          "providers": [
+            "CustomersService",
+            "CustomersResolver"
+          ]
+        },
+        {
+          "module": "EmployeesModule",
+          "controllers": [],
+          "providers": [
+            "EmployeesService",
+            "EmployeesResolver"
+          ]
+        },
+        {
+          "module": "GqlModule",
+          "controllers": [],
+          "providers": []
+        },
+        {
+          "module": "HelloModule",
+          "controllers": [],
+          "providers": [
+            "HelloResolver",
+            "HelloService"
+          ]
+        },
+        {
+          "module": "InteractionSummariesModule",
+          "controllers": [],
+          "providers": [
+            "InteractionSummariesService",
+            "InteractionSummariesResolver",
+            "InteractionSummariesLoader"
+          ]
+        }
+      ]
+    }
+  }
+}

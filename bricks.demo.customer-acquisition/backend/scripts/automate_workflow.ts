@@ -10,6 +10,13 @@ const API_BASE_URL = 'http://localhost:3001/api';
 const CLIENT_DIR = path.resolve(__dirname, '../../client');
 const SERVER_DIR = path.resolve(__dirname, '../../server');
 const SPECS_DIR = path.resolve(__dirname, '../../spec');
+const RAW_IR_DIR = path.resolve(__dirname, '../raw_IR');
+
+function ensureRawDir() {
+    if (!fs.existsSync(RAW_IR_DIR)) {
+        fs.mkdirSync(RAW_IR_DIR, { recursive: true });
+    }
+}
 
 
 async function runWorkflow() {
@@ -36,12 +43,15 @@ async function runWorkflow() {
         console.log('Generating Frontend IR...');
         const frontendIRRes = await axios.post(`${API_BASE_URL}/ir/frontend`, { directory: CLIENT_DIR });
         const frontendIR = frontendIRRes.data;
-        console.log('✅ Frontend IR Generated.');
+        ensureRawDir();
+        fs.writeFileSync(path.join(RAW_IR_DIR, 'frontend-raw.json'), JSON.stringify(frontendIR, null, 2));
+        console.log('✅ Frontend IR Generated and Saved to raw_IR/frontend-raw.json.');
 
         console.log('Generating Backend IR...');
         const backendIRRes = await axios.post(`${API_BASE_URL}/ir/backend`, { directory: SERVER_DIR });
         const backendIR = backendIRRes.data;
-        console.log('✅ Backend IR Generated.');
+        fs.writeFileSync(path.join(RAW_IR_DIR, 'backend-raw.json'), JSON.stringify(backendIR, null, 2));
+        console.log('✅ Backend IR Generated and Saved to raw_IR/backend-raw.json.');
 
         // 3. Transform IRs
         console.log('\n--- Transforming IRs ---');

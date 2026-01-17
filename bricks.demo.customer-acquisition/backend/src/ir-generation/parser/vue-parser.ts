@@ -69,9 +69,22 @@ export function getComponentName(filePath: string): string {
  */
 export function deriveRouteFromPath(filePath: string): string {
     const pagesIndex = filePath.indexOf('pages');
-    if (pagesIndex === -1) return '/';
+    const viewsIndex = filePath.indexOf('views');
 
-    let routePath = filePath.substring(pagesIndex + 6);
+    let rootIndex = -1;
+    let offset = 0;
+
+    if (pagesIndex !== -1) {
+        rootIndex = pagesIndex;
+        offset = 6; // 'pages/'.length
+    } else if (viewsIndex !== -1) {
+        rootIndex = viewsIndex;
+        offset = 6; // 'views/'.length
+    }
+
+    if (rootIndex === -1) return '/';
+
+    let routePath = filePath.substring(rootIndex + offset);
     routePath = routePath.replace('.vue', '');
     routePath = routePath.replace(/\/index$/, '');
     if (routePath === 'index') routePath = '';
@@ -90,9 +103,9 @@ export function classifyVueFile(filePath: string): 'page' | 'component' | 'layou
     const normalizedPath = filePath.replace(/\\/g, '/').toLowerCase();
 
     if (
-        normalizedPath.includes('/pages/') || 
+        normalizedPath.includes('/pages/') ||
         normalizedPath.startsWith('pages/') ||
-        normalizedPath.includes('/views/') || 
+        normalizedPath.includes('/views/') ||
         normalizedPath.startsWith('views/')
     ) {
         return 'page';
@@ -310,6 +323,7 @@ export function extractApiCalls(scriptContent: string): { operationName: string;
             const obj = findFirstChildByType(memberExpr, 'member_expression') || findFirstChildByType(memberExpr, 'identifier');
 
             if (prop && obj && getNodeText(obj).includes('$apollo') && ['query', 'mutate'].includes(getNodeText(prop))) {
+                // console.log('Found apollo call:', getNodeText(prop));
                 const args = findFirstChildByType(call, 'arguments');
                 if (args) {
                     const objectArg = findFirstChildByType(args, 'object');
@@ -344,9 +358,21 @@ export function extractApiCalls(scriptContent: string): { operationName: string;
 /**
  * Extract function definitions and their internal calls using AST
  */
-export function extractFunctions(scriptContent: string): { name: string; isAsync: boolean; calls: string[] }[] {
+export function extractFunctions(scriptContent: string): {
+    name: string;
+    isAsync: boolean;
+    calls: string[];
+    type: 'function' | 'computed' | 'watch' | 'hook';
+    codeSnippet?: string;
+}[] {
     const tree = parseTypeScript(scriptContent);
-    const functions: { name: string; isAsync: boolean; calls: string[] }[] = [];
+    const functions: {
+        name: string;
+        isAsync: boolean;
+        calls: string[];
+        type: 'function' | 'computed' | 'watch' | 'hook';
+        codeSnippet?: string;
+    }[] = [];
 
     // 1. Variable Declarations (const foo = () => {})
     const varDecls = findDescendantsByType(tree.rootNode, 'variable_declarator');
@@ -362,7 +388,42 @@ export function extractFunctions(scriptContent: string): { name: string; isAsync
             const body = findFirstChildByType(arrowFunc, 'statement_block') || arrowFunc; // block or direct return
             const calls = extractInternalCalls(body);
 
-            functions.push({ name, isAsync, calls });
+            functions.push({
+                name,
+                isAsync,
+                calls,
+                type: 'function',
+                codeSnippet: body.text.length > 500 ? body.text.substring(0, 500) + '...' : body.text
+            });
+            continue; // Skip other checks if this matches
+        }
+
+        // 1.1 Support for computed/watch: const stats = computed(() => ...)
+        const callExpr = findFirstChildByType(decl, 'call_expression');
+        if (nameNode && callExpr) {
+            const callee = findFirstChildByType(callExpr, 'identifier');
+            if (callee && ['computed', 'watch'].includes(getNodeText(callee))) {
+                const name = getNodeText(nameNode);
+                const type = getNodeText(callee) as 'computed' | 'watch';
+
+                // Find inner function in arguments
+                const args = findFirstChildByType(callExpr, 'arguments');
+                if (args) {
+                    const innerFunc = findFirstChildByType(args, 'arrow_function') ||
+                        findFirstChildByType(args, 'function_expression');
+                    if (innerFunc) {
+                        const body = findFirstChildByType(innerFunc, 'statement_block') || innerFunc;
+                        const calls = extractInternalCalls(body);
+                        functions.push({
+                            name,
+                            isAsync: innerFunc.text.startsWith('async'),
+                            calls,
+                            type,
+                            codeSnippet: body.text.length > 500 ? body.text.substring(0, 500) + '...' : body.text
+                        });
+                    }
+                }
+            }
         }
     }
 
@@ -377,7 +438,13 @@ export function extractFunctions(scriptContent: string): { name: string; isAsync
             const body = findFirstChildByType(decl, 'statement_block');
             const calls = body ? extractInternalCalls(body) : [];
 
-            functions.push({ name, isAsync, calls });
+            functions.push({
+                name,
+                isAsync,
+                calls,
+                type: 'function',
+                codeSnippet: body ? (body.text.length > 500 ? body.text.substring(0, 500) + '...' : body.text) : undefined
+            });
         }
     }
 
@@ -406,6 +473,39 @@ function extractInternalCalls(node: SyntaxNode): string[] {
     }
 
     return [...new Set(calls)]; // Unique calls
+}
+
+/**
+ * Extract top-level constants (arrays/objects) from script
+ */
+export function extractConstants(scriptContent: string): { name: string; value: string }[] {
+    const tree = parseTypeScript(scriptContent);
+    const constants: { name: string; value: string }[] = [];
+
+    const varDecls = findDescendantsByType(tree.rootNode, 'variable_declarator');
+    for (const decl of varDecls) {
+        const nameNode = findFirstChildByType(decl, 'identifier');
+        const initNode = decl.children.find(c =>
+            c.type === 'array' ||
+            c.type === 'object' ||
+            c.type === 'string' ||
+            c.type === 'number'
+        );
+
+        if (nameNode && initNode) {
+            // Filter out common non-config variables to reduce noise
+            const name = getNodeText(nameNode);
+            if (['router', 'route', 'emit', 'props'].includes(name)) continue;
+
+            // Simple heuristic: if it looks like configuration data
+            constants.push({
+                name,
+                value: getNodeText(initNode)
+            });
+        }
+    }
+
+    return constants;
 }
 
 // ============ Template UI Extraction Functions ============
@@ -545,4 +645,164 @@ export function extractDisabledStates(templateContent: string): { element: strin
     }
 
     return states;
+}
+
+// ============ Advanced Structural Extraction Functions ============
+
+/**
+ * Extract rich metadata for computed properties (Phase 1)
+ */
+export function extractComputedMetadata(scriptContent: string): any[] {
+    const tree = parseTypeScript(scriptContent);
+    const results: any[] = [];
+
+    const varDecls = findDescendantsByType(tree.rootNode, 'variable_declarator');
+    for (const decl of varDecls) {
+        const nameNode = findFirstChildByType(decl, 'identifier');
+        const callExpr = findFirstChildByType(decl, 'call_expression');
+
+        if (nameNode && callExpr) {
+            const callee = findFirstChildByType(callExpr, 'identifier');
+            if (callee && getNodeText(callee) === 'computed') {
+                const name = getNodeText(nameNode);
+                const args = findFirstChildByType(callExpr, 'arguments');
+                if (args) {
+                    const func = findFirstChildByType(args, 'arrow_function') ||
+                        findFirstChildByType(args, 'function_expression');
+                    if (func) {
+                        const body = findFirstChildByType(func, 'statement_block') || func;
+
+                        // Extract all identifiers used inside (potential dependencies)
+                        const identifiers = findDescendantsByType(body, 'identifier');
+                        const dependsOn = [...new Set(identifiers
+                            .map(id => getNodeText(id))
+                            .filter(text => !['computed', 'Math', 'console', 'JSON'].includes(text)))];
+
+                        // Heuristic for "derives": look for return object keys
+                        const derives: string[] = [];
+                        results.push({
+                            name,
+                            dependsOn: dependsOn.filter(d => d !== name),
+                            derives: [], // Placeholder for future deepening
+                            usedIn: [],
+                            codeSnippet: body.text.length > 500 ? body.text.substring(0, 500) + '...' : body.text
+                        });
+                    }
+                }
+            }
+        }
+    }
+    return results;
+}
+
+/**
+ * Trace data flow from APIs to producers (Phase 2)
+ */
+export function extractDataFlows(scriptContent: string): any[] {
+    const tree = parseTypeScript(scriptContent);
+    const flows: any[] = [];
+
+    const varDecls = findDescendantsByType(tree.rootNode, 'variable_declarator');
+
+    for (const decl of varDecls) {
+        const callExpr = findFirstChildByType(decl, 'call_expression') ||
+            findDescendantsByType(decl, 'call_expression')[0];
+
+        if (callExpr) {
+            const callee = findDescendantsByType(callExpr, 'identifier').find(id =>
+                ['useQuery', 'useMutation', '$apollo'].some(s => id.text.includes(s))
+            );
+
+            if (callee) {
+                const produces: string[] = [];
+                const nameNode = findFirstChildByType(decl, 'identifier') ||
+                    findFirstChildByType(decl, 'object_pattern');
+
+                if (nameNode) {
+                    if (nameNode.type === 'object_pattern') {
+                        const shorthand = findDescendantsByType(nameNode, 'shorthand_property_identifier_pattern');
+                        shorthand.forEach(s => produces.push(getNodeText(s)));
+                    } else {
+                        produces.push(getNodeText(nameNode));
+                    }
+                }
+
+                flows.push({
+                    source: getNodeText(callee),
+                    produces,
+                    consumedBy: []
+                });
+            }
+        }
+    }
+
+    return flows;
+}
+
+/**
+ * Extract UI state transitions (Phase 3)
+ */
+export function extractUIStates(scriptContent: string): any[] {
+    const tree = parseTypeScript(scriptContent);
+    const states: any[] = [];
+
+    const varDecls = findDescendantsByType(tree.rootNode, 'variable_declarator');
+    for (const decl of varDecls) {
+        const nameNode = findFirstChildByType(decl, 'identifier');
+        if (nameNode) {
+            const name = getNodeText(nameNode);
+            if (['isOpen', 'isEditing', 'mode', 'status'].some(s => name.toLowerCase().includes(s))) {
+                states.push({
+                    name,
+                    states: ['dynamic'],
+                    transitions: []
+                });
+            }
+        }
+    }
+    return states;
+}
+
+/**
+ * Identify Domain Entities (Phase 4)
+ */
+export function extractEntities(scriptContent: string): any[] {
+    const tree = parseTypeScript(scriptContent);
+    const entities: any[] = [];
+
+    const typeAliases = findDescendantsByType(tree.rootNode, 'type_alias_declaration');
+    for (const alias of typeAliases) {
+        const nameNode = findFirstChildByType(alias, 'type_identifier');
+        if (nameNode) {
+            const name = getNodeText(nameNode);
+            if (['Customer', 'Interaction', 'Contact'].some(e => name.includes(e))) {
+                entities.push({ name, fields: [] });
+            }
+        }
+    }
+    return entities;
+}
+
+/**
+ * Extract Business Rules (Phase 5)
+ */
+export function extractBusinessRules(scriptContent: string): any[] {
+    const tree = parseTypeScript(scriptContent);
+    const rules: any[] = [];
+
+    const varDecls = findDescendantsByType(tree.rootNode, 'variable_declarator');
+    for (const decl of varDecls) {
+        const nameNode = findFirstChildByType(decl, 'identifier');
+        if (nameNode) {
+            const name = getNodeText(nameNode);
+            if (['needs', 'isValid', 'should', 'can'].some(p => name.startsWith(p))) {
+                rules.push({
+                    name,
+                    condition: "Internal Logic",
+                    affects: []
+                });
+            }
+        }
+    }
+    return rules;
 }

@@ -8,6 +8,18 @@ dotenv.config();
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
 
 // ============================================================================
+// HELPERS
+// ============================================================================
+
+function ensureTransformedDir(): string {
+  const dirPath = path.resolve(process.cwd(), 'transformed_IR');
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+  return dirPath;
+}
+
+// ============================================================================
 // FRONTEND TRANSFORMATION
 // ============================================================================
 
@@ -21,7 +33,7 @@ export async function transformIRToSimplified(ir: IR): Promise<ChatbotFriendlyDo
   }
 
   const components: ComponentIR[] = [...ir.frontend.pages, ...ir.frontend.components];
-  const model = genAI.getGenerativeModel({ 
+  const model = genAI.getGenerativeModel({
     model: 'gemini-2.5-flash',
     generationConfig: {
       temperature: 0.1, // Low temperature for consistent, factual output
@@ -49,6 +61,11 @@ INPUT DATA STRUCTURE:
 - "disabledStates": Conditions when UI elements are disabled
 - "componentsUsed": Technical UI components used
 - "functions": Available functions and their purposes
+- "computed": Calculated stats/variables with their dependencies (EXPLAIN WHERE NUMBERS COME FROM)
+- "dataFlow": Tracing of API data into state variables
+- "uiStates": Statuses like "loading", "editing", "modal open"
+- "entities": Domain concepts (e.g., Customer, Interaction)
+- "rules": Business conditions that affect UI behavior
 
 OUTPUT SCHEMA (STRICT JSON):
 {
@@ -67,6 +84,12 @@ OUTPUT SCHEMA (STRICT JSON):
       ],
       "conditionalStates": [
         "string (dynamic behaviors from disabledStates, explain conditions clearly)"
+      ],
+      "dataProvenance": [
+        "string (EXPLAIN ORIGIN: which API populates this, which 'computed' stats are used, and depend on what)"
+      ],
+      "businessLogic": [
+        "string (EXPLAIN RULES: conditions like 'needs attention if...', validation rules, and logic for derived values)"
       ],
       "technicalImplementation": {
         "components": ["array of componentsUsed"],
@@ -145,6 +168,14 @@ Example 2 - Form with Fields:
     "All form fields are disabled while the interaction is being saved (isSubmitting).",
     "The submit button is disabled if the form is invalid (!meta.valid) or currently submitting."
   ],
+  "dataProvenance": [
+    "This component contributes to the 'Interaction' entity lifecycle.",
+    "Upon success, it triggers a refresh of the customer's interaction history."
+  ],
+  "businessLogic": [
+    "Requires a valid date and message to be submitted.",
+    "The 'type' of interaction must be selected from the predefined list (Call, Email, Meeting)."
+  ],
   "technicalImplementation": {
     "components": ["UModal", "UFormField", "UInput", "UTextarea"],
     "functions": ["onSubmit", "handleFormSubmit"],
@@ -180,7 +211,7 @@ Generate the JSON output now:
 
   // Clean markdown code blocks if present
   let cleanedText = text.replace(/```json\s*/g, '').replace(/```\s*/g, '');
-  
+
   const jsonMatch = cleanedText.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
     console.error("LLM Response:", text);
@@ -188,41 +219,42 @@ Generate the JSON output now:
   }
 
   const parsed = JSON.parse(jsonMatch[0]) as ChatbotFriendlyDoc;
-  
+
   // Validate output
   validateFrontendOutput(parsed, components);
   console.log("Frontend's parsed", parsed)
   // Save simplified JSON
-  fs.writeFileSync(path.resolve(process.cwd(), 'frontend-simplified.json'), JSON.stringify(parsed, null, 2));
-  
+  const transformedDir = ensureTransformedDir();
+  fs.writeFileSync(path.join(transformedDir, 'frontend-simplified.json'), JSON.stringify(parsed, null, 2));
+
   return parsed;
 }
 
 // Validation function to catch hallucinations
 function validateFrontendOutput(output: ChatbotFriendlyDoc, originalComponents: ComponentIR[]) {
   const warnings: string[] = [];
-  
+
   output.elements.forEach((element, idx) => {
     const original = originalComponents.find(c => c.name === element.name);
-    
+
     if (!original) {
       warnings.push(`Element "${element.name}" not found in original IR`);
       return;
     }
-    
+
     // Check if described elements match source data
     if ('visibleElements' in element && element.visibleElements) {
       const hasLabels = original.labels && original.labels.length > 0;
       const hasFormFields = original.formFields && original.formFields.length > 0;
-      
+
       if (!hasLabels && !hasFormFields && element.visibleElements.length > 3) {
         warnings.push(`⚠️  "${element.name}": Describes many UI elements but source has no labels/formFields. Possible hallucination.`);
       }
-      
+
       // Check for common hallucination patterns
       const visibleText = element.visibleElements.join(' ').toLowerCase();
       if (visibleText.includes('username') || visibleText.includes('password')) {
-        const hasUsernameLabel = original.labels?.some(l => 
+        const hasUsernameLabel = original.labels?.some(l =>
           l.text.toLowerCase().includes('username') || l.text.toLowerCase().includes('password')
         );
         if (!hasUsernameLabel) {
@@ -231,7 +263,7 @@ function validateFrontendOutput(output: ChatbotFriendlyDoc, originalComponents: 
       }
     }
   });
-  
+
   if (warnings.length > 0) {
     console.warn('\n⚠️  VALIDATION WARNINGS:\n' + warnings.join('\n'));
   }
@@ -250,7 +282,7 @@ export async function transformBackendIRToSimplified(ir: IR): Promise<ChatbotFri
     throw new Error('GOOGLE_API_KEY is not set in environment variables');
   }
 
-  const model = genAI.getGenerativeModel({ 
+  const model = genAI.getGenerativeModel({
     model: 'gemini-2.5-flash',
     generationConfig: {
       temperature: 0.1,
@@ -258,7 +290,7 @@ export async function transformBackendIRToSimplified(ir: IR): Promise<ChatbotFri
       topK: 40,
     }
   });
-  
+
   const elements: BackendTransformedElement[] = [];
 
   // Process all backend components in parallel for better performance
@@ -276,7 +308,8 @@ export async function transformBackendIRToSimplified(ir: IR): Promise<ChatbotFri
 
   console.log("Frontend's parsed", result)
   // Save simplified JSON
-  fs.writeFileSync(path.resolve(process.cwd(), 'backend-simplified.json'), JSON.stringify(result, null, 2));
+  const transformedDir = ensureTransformedDir();
+  fs.writeFileSync(path.join(transformedDir, 'backend-simplified.json'), JSON.stringify(result, null, 2));
 
   return result;
 }
@@ -587,10 +620,10 @@ async function generateAndParse<T>(model: any, prompt: string): Promise<T[]> {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     let text = response.text();
-    
+
     // Clean markdown code blocks
     text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '');
-    
+
     const jsonMatch = text.match(/\{[\s\S]*\}/);
 
     if (!jsonMatch) {

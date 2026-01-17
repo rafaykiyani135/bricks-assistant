@@ -51,16 +51,19 @@ export async function ingestToLanceDB(
 
     if ('technicalDetails' in element) {
       // Backend Element
+      const be = element as any;
       textChunk = `
-Name: ${element.name}
-Type: ${element.type}
-Summary: ${element.summary}
-Details: ${(element.technicalDetails || []).join(', ')}
-Dependencies: ${(element.dependencies || []).join(', ')}
+Name: ${be.name}
+Type: ${be.type}
+Summary: ${be.summary}
+Details: ${(be.technicalDetails || []).join(', ')}
+Dependencies: ${(be.dependencies || []).join(', ')}
+Capabilities: ${(be.capabilities || []).join(', ')}
+Invokes: ${(be.invokes || []).join(', ')}
+Security: ${be.security ? `Auth: ${be.security.authRequired}, Guards: ${be.security.guards.join(', ')}` : 'Public'}
 `.trim();
     } else {
       // Frontend Element
-      // We cast to any or use the known Frontend interface properties
       const fe = element as any;
       textChunk = `
 Name: ${fe.name}
@@ -70,6 +73,8 @@ Summary: ${fe.summaryDescriptionInLaymansTerms}
 Actions: ${fe.detailedUserActions.join(', ')}
 Elements: ${fe.visibleElements.join(', ')}
 States: ${fe.conditionalStates.join(', ')}
+Provenance: ${(fe.dataProvenance || []).join(', ')}
+Logic: ${(fe.businessLogic || []).join(', ')}
 `.trim();
     }
 

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { queryKnowledgeBase, classifyIntent } from '../rag-processing/query';
+import { queryKnowledgeBase, classifyIntent, queryHybridFrontendSpecs } from '../rag-processing/query';
 
 export async function queryKB(req: Request, res: Response) {
     try {
@@ -24,18 +24,18 @@ export async function queryKB(req: Request, res: Response) {
             console.log('🤖 No table specified. Auto-detecting intent...');
             const intent = await classifyIntent(query);
             if (intent === 'FRONTEND') {
-                targetTable = 'frontend_knowledge_base_v1';
-            } else if (intent === 'SPECS') {
-                targetTable = 'specs_knowledge_base_v1';
+                targetTable = 'HYBRID_FRONTEND_SPECS';
             } else {
                 targetTable = 'backend_knowledge_base_v1';
             }
-            console.log(`🎯 Detected Intent: ${intent} -> Using table: ${targetTable}`);
+            console.log(`🎯 Detected Intent: ${intent} -> Using strategy: ${targetTable}`);
         } else {
             console.log(`ℹ️ Using specified table: ${targetTable}`);
         }
 
-        const result = await queryKnowledgeBase(query, targetTable);
+        const result = targetTable === 'HYBRID_FRONTEND_SPECS'
+            ? await queryHybridFrontendSpecs(query)
+            : await queryKnowledgeBase(query, targetTable);
 
         res.json(result);
     } catch (error: any) {

@@ -29,25 +29,23 @@ export interface QueryResult {
     context: any[];
 }
 
-export async function classifyIntent(query: string): Promise<'FRONTEND' | 'BACKEND' | 'SPECS'> {
+export async function classifyIntent(query: string): Promise<'FRONTEND' | 'BACKEND'> {
     const prompt = `
 You are an intent classifier for a software documentation assistant.
 
 Your job is to decide whether a user's question requires information from:
 - FRONTEND documentation (UI, screens, buttons, user flows, interactions)
 - BACKEND documentation (APIs, services, controllers, database, business logic)
-- SPECS documentation (requirements, specifications, user stories, use cases, business rules)
 
 Classification rules:
 - Choose FRONTEND if the answer depends on how a user interacts with the UI.
 - Choose BACKEND if the answer depends on server-side logic, APIs, or data handling.
-- Choose SPECS if the question is about requirements, specifications, features, user stories, or business rules.
 - Choose FRONTEND if the question mentions steps a user performs in the app.
 - Choose BACKEND if the question mentions requests, responses, validation, or persistence.
 - If the question involves multiple areas, choose the one that is most essential to answer the question.
 
 Output format:
-Return ONLY one word: FRONTEND, BACKEND, or SPECS.
+Return ONLY one word: FRONTEND, BACKEND.
 Do not explain your reasoning.
 
 USER QUESTION: "${query}"
@@ -65,7 +63,6 @@ USER QUESTION: "${query}"
 
         // Safety check to ensure we only return valid intents
         if (intent.includes('FRONTEND')) return 'FRONTEND';
-        if (intent.includes('SPECS')) return 'SPECS';
         return 'BACKEND';
 
     } catch (error) {
@@ -112,6 +109,64 @@ export async function queryKnowledgeBase(query: string, tableName: string = 'fro
             type: r.type,
             text: r.text,
             distance: r._distance
+        }))
+    };
+}
+
+/**
+ * Hybrid search across Frontend and Specs tables
+ */
+export async function queryHybridFrontendSpecs(query: string): Promise<QueryResult> {
+    const dbDir = path.resolve(__dirname, '../../lancedb_data');
+    if (!fs.existsSync(dbDir)) {
+        throw new Error(`Database directory not found at ${dbDir}. Please run ingestion first.`);
+    }
+
+    const db = await lancedb.connect(dbDir);
+    const existingTables = await db.tableNames();
+
+    // Tables to search
+    const tablesToSearch = ['frontend_knowledge_base_v1', 'specs_knowledge_base_v1']
+        .filter(t => existingTables.includes(t));
+
+    if (tablesToSearch.length === 0) {
+        throw new Error('No relevant tables (frontend or specs) found for hybrid search.');
+    }
+
+    const queryEmbedding = (await embedder.generate([query]))[0];
+
+    // Search all tables in parallel
+    const searchTasks = tablesToSearch.map(async (tableName) => {
+        const table = await db.openTable(tableName);
+        const results = await table.vectorSearch(queryEmbedding).limit(5).toArray();
+        return results.map((r: any) => ({ ...r, tableName }));
+    });
+
+    const allResults = (await Promise.all(searchTasks)).flat();
+
+    // Sort by distance and take top 5
+    const topResults = allResults
+        .sort((a, b) => (a._distance || 0) - (b._distance || 0))
+        .slice(0, 5);
+
+    if (topResults.length === 0) {
+        return {
+            answer: "I couldn't find any relevant frontend or specification information.",
+            context: []
+        };
+    }
+
+    const retrievedContexts = topResults.map((r: any) => r.text);
+    const answer = await generateAnswer(query, retrievedContexts);
+
+    return {
+        answer,
+        context: topResults.map((r: any) => ({
+            name: r.name,
+            type: r.type,
+            text: r.text,
+            distance: r._distance,
+            sourceTable: r.tableName
         }))
     };
 }

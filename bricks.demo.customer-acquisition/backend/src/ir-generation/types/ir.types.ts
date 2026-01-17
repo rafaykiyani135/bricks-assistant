@@ -136,6 +136,39 @@ export interface ComponentFunctionIR {
     name: string;
     isAsync: boolean;
     calls: string[]; // Functions or composables called
+    codeSnippet?: string; // Logic body snippet (truncated)
+    type?: 'function' | 'computed' | 'watch' | 'hook';
+}
+
+export interface ComputedIR {
+    name: string;
+    dependsOn: string[];
+    derives: string[];
+    usedIn: string[];
+    codeSnippet?: string;
+}
+
+export interface DataFlowIR {
+    source: string;
+    produces: string[];
+    consumedBy: string[];
+}
+
+export interface UIStateIR {
+    name: string;
+    states: string[];
+    transitions: { event: string; to: string }[];
+}
+
+export interface EntityIR {
+    name: string;
+    fields: string[];
+}
+
+export interface BusinessRuleIR {
+    name: string;
+    condition: string;
+    affects: string[];
 }
 
 // ============ UI Extraction Types ============
@@ -183,6 +216,14 @@ export interface ComponentIR {
     actions: UIActionIR[];
     formFields: FormFieldIR[];
     disabledStates: DisabledStateIR[];
+    constants?: { name: string; value: string }[];
+
+    // Advanced structural sections
+    computed?: ComputedIR[];
+    dataFlow?: DataFlowIR[];
+    uiStates?: UIStateIR[];
+    entities?: EntityIR[];
+    rules?: BusinessRuleIR[];
 }
 
 export interface StoreStateIR {
