@@ -281,6 +281,50 @@ paths:
         '500':
           description: Internal server error
 
+  /api/ingest/specs:
+    post:
+      summary: Ingest Specs from Markdown Files
+      description: Reads markdown files from specs directory, chunks them, and stores in LanceDB
+      tags:
+        - Ingestion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - directory
+              properties:
+                directory:
+                  type: string
+                  description: Absolute path to specs directory containing .md files
+                  example: C:/projects/my-app/specs
+      responses:
+        '200':
+          description: Specs ingested successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Successfully ingested 45 chunks from 3 files
+                  chunksAdded:
+                    type: integer
+                    example: 45
+                  filesProcessed:
+                    type: integer
+                    example: 3
+        '400':
+          description: Bad request - directory path missing
+        '500':
+          description: Internal server error
+
   /api/query:
     post:
       summary: Query the Knowledge Base

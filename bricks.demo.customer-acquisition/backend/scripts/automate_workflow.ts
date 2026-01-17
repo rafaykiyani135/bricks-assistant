@@ -9,6 +9,8 @@ dotenv.config({ path: path.resolve(__dirname, '../../backend/.env') });
 const API_BASE_URL = 'http://localhost:3001/api';
 const CLIENT_DIR = path.resolve(__dirname, '../../client');
 const SERVER_DIR = path.resolve(__dirname, '../../server');
+const SPECS_DIR = path.resolve(__dirname, '../../spec');
+
 
 async function runWorkflow() {
     console.log('🚀 Starting Automation Workflow...');
@@ -20,6 +22,10 @@ async function runWorkflow() {
     }
     if (!fs.existsSync(SERVER_DIR)) {
         console.error(`❌ Server directory not found at: ${SERVER_DIR}`);
+        return;
+    }
+    if (!fs.existsSync(SPECS_DIR)) {
+        console.error(`❌ Specs directory not found at: ${SPECS_DIR}`);
         return;
     }
     console.log('✅ Directories detected.');
@@ -56,7 +62,7 @@ async function runWorkflow() {
         console.log('Ingesting Frontend data...');
         await axios.post(`${API_BASE_URL}/ingest`, {
             simplifiedIR: frontendSimplified,
-            tableName: 'frontend_knowledge_base_v1' // Explicitly targeting frontend KB
+            tableName: 'frontend_knowledge_base_v1'
         });
         console.log('✅ Frontend Data Ingested.');
 
@@ -64,9 +70,16 @@ async function runWorkflow() {
         console.log('Ingesting Backend data...');
         await axios.post(`${API_BASE_URL}/ingest`, {
             simplifiedIR: backendSimplified,
-            tableName: 'backend_knowledge_base_v1' // Explicitly targeting backend KB
+            tableName: 'backend_knowledge_base_v1'
         });
         console.log('✅ Backend Data Ingested.');
+
+        // Ingest Specs
+        console.log('Ingesting Specs data...');
+        await axios.post(`${API_BASE_URL}/ingest/specs`, {
+            directory: SPECS_DIR
+        });
+        console.log('✅ Specs Data Ingested.');
 
         console.log('\n🎉 Workflow Completed Successfully!');
         console.log('You can now use the Query Endpoint to ask questions.');

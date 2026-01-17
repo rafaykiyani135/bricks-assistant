@@ -29,23 +29,25 @@ export interface QueryResult {
     context: any[];
 }
 
-export async function classifyIntent(query: string): Promise<'FRONTEND' | 'BACKEND'> {
+export async function classifyIntent(query: string): Promise<'FRONTEND' | 'BACKEND' | 'SPECS'> {
     const prompt = `
 You are an intent classifier for a software documentation assistant.
 
 Your job is to decide whether a user's question requires information from:
 - FRONTEND documentation (UI, screens, buttons, user flows, interactions)
 - BACKEND documentation (APIs, services, controllers, database, business logic)
+- SPECS documentation (requirements, specifications, user stories, use cases, business rules)
 
 Classification rules:
 - Choose FRONTEND if the answer depends on how a user interacts with the UI.
 - Choose BACKEND if the answer depends on server-side logic, APIs, or data handling.
+- Choose SPECS if the question is about requirements, specifications, features, user stories, or business rules.
 - Choose FRONTEND if the question mentions steps a user performs in the app.
 - Choose BACKEND if the question mentions requests, responses, validation, or persistence.
-- If the question involves both, choose the one that is more essential to answer the question.
+- If the question involves multiple areas, choose the one that is most essential to answer the question.
 
 Output format:
-Return ONLY one word: FRONTEND or BACKEND.
+Return ONLY one word: FRONTEND, BACKEND, or SPECS.
 Do not explain your reasoning.
 
 USER QUESTION: "${query}"
@@ -63,6 +65,7 @@ USER QUESTION: "${query}"
 
         // Safety check to ensure we only return valid intents
         if (intent.includes('FRONTEND')) return 'FRONTEND';
+        if (intent.includes('SPECS')) return 'SPECS';
         return 'BACKEND';
 
     } catch (error) {

@@ -8,6 +8,7 @@ import { generateFrontendIR } from './api/frontend-ir.controller';
 import { generateBackendIR } from './api/backend-ir.controller';
 import { transformFrontendIR, transformBackendIR } from './api/transform.controller';
 import { ingestSimplifiedIR } from './api/ingest.controller';
+import { ingestSpecs } from './api/specs.controller';
 import { queryKB } from './api/query.controller';
 
 dotenv.config();
@@ -35,8 +36,9 @@ app.post('/api/ir/backend', generateBackendIR);
 app.post('/api/transform/frontend', transformFrontendIR);
 app.post('/api/transform/backend', transformBackendIR);
 
-// Ingestion Endpoint
+// Ingestion Endpoints
 app.post('/api/ingest', ingestSimplifiedIR);
+app.post('/api/ingest/specs', ingestSpecs);
 
 // Query Endpoint
 app.post('/api/query', queryKB);

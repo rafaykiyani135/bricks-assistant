@@ -95,6 +95,7 @@ States: ${fe.conditionalStates.join(', ')}
 
   const existingTableNames = await db.tableNames();
   if (existingTableNames.includes(targetTable!)) {
+    console.log(`Table ${targetTable} already exists. Dropping and recreating...`);
     await db.dropTable(targetTable!);
   }
 
