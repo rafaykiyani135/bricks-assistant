@@ -23,7 +23,13 @@ export async function queryKB(req: Request, res: Response) {
         if (!targetTable) {
             console.log('🤖 No table specified. Auto-detecting intent...');
             const intent = await classifyIntent(query);
-            targetTable = intent === 'FRONTEND' ? 'frontend_knowledge_base_v1' : 'backend_knowledge_base_v1';
+            if (intent === 'FRONTEND') {
+                targetTable = 'frontend_knowledge_base_v1';
+            } else if (intent === 'SPECS') {
+                targetTable = 'specs_knowledge_base_v1';
+            } else {
+                targetTable = 'backend_knowledge_base_v1';
+            }
             console.log(`🎯 Detected Intent: ${intent} -> Using table: ${targetTable}`);
         } else {
             console.log(`ℹ️ Using specified table: ${targetTable}`);
