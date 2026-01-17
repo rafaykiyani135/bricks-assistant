@@ -30,6 +30,7 @@ import {
     extractUIActions,
     extractFormFields,
     extractDisabledStates,
+    extractConstants,
 } from '../parser/vue-parser';
 import { ParsedFile } from '../types/ir.types';
 
@@ -111,6 +112,9 @@ export function extractComponent(file: ParsedFile): ExtractionResult<ComponentIR
         condition: d.condition,
     }));
 
+    // Extract constants (new)
+    const constants = extractConstants(vueFile.scriptContent);
+
     components.push({
         name,
         file: file.relativePath,
@@ -127,6 +131,7 @@ export function extractComponent(file: ParsedFile): ExtractionResult<ComponentIR
         actions,
         formFields,
         disabledStates,
+        constants,
     });
 
     return { items: components, filePath: file.relativePath };

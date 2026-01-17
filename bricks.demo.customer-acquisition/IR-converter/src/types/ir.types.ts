@@ -183,6 +183,7 @@ export interface ComponentIR {
     actions: UIActionIR[];
     formFields: FormFieldIR[];
     disabledStates: DisabledStateIR[];
+    constants?: { name: string; value: string }[];
 }
 
 export interface StoreStateIR {

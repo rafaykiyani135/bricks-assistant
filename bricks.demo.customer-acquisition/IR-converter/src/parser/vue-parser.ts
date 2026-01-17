@@ -69,9 +69,22 @@ export function getComponentName(filePath: string): string {
  */
 export function deriveRouteFromPath(filePath: string): string {
     const pagesIndex = filePath.indexOf('pages');
-    if (pagesIndex === -1) return '/';
+    const viewsIndex = filePath.indexOf('views');
+    
+    let rootIndex = -1;
+    let offset = 0;
 
-    let routePath = filePath.substring(pagesIndex + 6);
+    if (pagesIndex !== -1) {
+        rootIndex = pagesIndex;
+        offset = 6; // 'pages/'.length
+    } else if (viewsIndex !== -1) {
+        rootIndex = viewsIndex;
+        offset = 6; // 'views/'.length
+    }
+
+    if (rootIndex === -1) return '/';
+
+    let routePath = filePath.substring(rootIndex + offset);
     routePath = routePath.replace('.vue', '');
     routePath = routePath.replace(/\/index$/, '');
     if (routePath === 'index') routePath = '';
@@ -310,6 +323,7 @@ export function extractApiCalls(scriptContent: string): { operationName: string;
             const obj = findFirstChildByType(memberExpr, 'member_expression') || findFirstChildByType(memberExpr, 'identifier');
 
             if (prop && obj && getNodeText(obj).includes('$apollo') && ['query', 'mutate'].includes(getNodeText(prop))) {
+                // console.log('Found apollo call:', getNodeText(prop));
                 const args = findFirstChildByType(call, 'arguments');
                 if (args) {
                     const objectArg = findFirstChildByType(args, 'object');
@@ -406,6 +420,39 @@ function extractInternalCalls(node: SyntaxNode): string[] {
     }
 
     return [...new Set(calls)]; // Unique calls
+}
+
+/**
+ * Extract top-level constants (arrays/objects) from script
+ */
+export function extractConstants(scriptContent: string): { name: string; value: string }[] {
+    const tree = parseTypeScript(scriptContent);
+    const constants: { name: string; value: string }[] = [];
+
+    const varDecls = findDescendantsByType(tree.rootNode, 'variable_declarator');
+    for (const decl of varDecls) {
+        const nameNode = findFirstChildByType(decl, 'identifier');
+        const initNode = decl.children.find(c => 
+            c.type === 'array' || 
+            c.type === 'object' || 
+            c.type === 'string' ||
+            c.type === 'number'
+        );
+
+        if (nameNode && initNode) {
+            // Filter out common non-config variables to reduce noise
+            const name = getNodeText(nameNode);
+            if (['router', 'route', 'emit', 'props'].includes(name)) continue;
+
+            // Simple heuristic: if it looks like configuration data
+            constants.push({
+                name,
+                value: getNodeText(initNode)
+            });
+        }
+    }
+
+    return constants;
 }
 
 // ============ Template UI Extraction Functions ============
