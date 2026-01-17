@@ -1,78 +1,76 @@
-# Unified Backend - IR Generation & RAG Processing
+# Unified Backend - Code Intelligence & RAG System
 
-Detailed documentation for the backend service that coordinates technical analysis (IR Generation), AI-driven simplification, and RAG-based querying using LanceDB and Groq.
+This backend service is the "brain" of the assistant. It transforms raw source code into an interactive, AI-powered knowledge base. By combining static code analysis with Large Language Models (LLMs), it allows developers and stakeholders to ask questions about a complex codebase in plain English.
+
+---
+
+## � The Intelligent Workflow
+
+The system follows a 5-phase pipeline to move from "Files on Disk" to "Instant Answers".
+
+### 1. Folder Detection & IR Generation
+*   **Layman's Explanation**: The system looks for your `client` (Frontend) and `server` (Backend) folders. It then "reads" the code, not just as text, but by understanding its structure (who calls whom, where the data flows).
+*   **Technical Detail**: 
+    - The `ir-generation` module uses **Tree-sitter** for high-fidelity AST (Abstract Syntax Tree) parsing.
+    - It extracts critical metadata like API endpoints, component hierarchies, database schemas, and function dependencies.
+    - Result: A high-level **Intermediate Representation (IR)** JSON that captures the "DNA" of the project.
+
+### 2. AI Transformation (The "Simplifier")
+*   **Layman's Explanation**: Technical code definitions are often too complex for a chatbot to explain clearly. This phase uses AI to translate dense code into "human-friendly" summaries.
+*   **Technical Detail**:
+    - The IR is sent to **Google Gemini 1.5 Flash**. 
+    - The AI analyzes the technical specs and generates `layout-friendly` summaries, explains the purpose of modules in layman's terms, and identifies core user flows.
+    - Result: A **Simplified IR** optimized for natural language retrieval.
+
+### 3. Ingest to LanceDB (Memory Storage)
+*   **Layman's Explanation**: To find answers quickly, the system "memorizes" the simplified code summaries by converting them into mathematical vectors (numbers) and storing them in a searchable database.
+*   **Technical Detail**:
+    - Text chunks are passed through **Google's text-embedding-004** model.
+    - The resulting 768-dimensional vectors are stored in **LanceDB**, a high-performance serverless vector database located in `lancedb_data/`.
+
+### 4. Intent Classification (The "Traffic Controller")
+*   **Layman's Explanation**: When you ask a question, the system first decides if you're asking about the "Look and Feel" (Frontend) or the "System Logic" (Backend). This ensures it searches the right "notebook" for the answer.
+*   **Technical Detail**:
+    - A specialized **Groq-powered LLM (Llama 3.3)** acts as a classifier.
+    - It evaluates your query against a custom system prompt to determine if the target is the `frontend` or `backend` knowledge base.
+
+### 5. Intelligent Query (RAG)
+*   **Layman's Explanation**: Finally, the system retrieves the most relevant "memories" from storage and uses them as a reference to write a factual, helpful answer to your question.
+*   **Technical Detail**:
+    - This implements **Retrieval-Augmented Generation (RAG)**.
+    - It performs a vector similarity search in the detected LanceDB table.
+    - The top results are fed into a final Groq LLM prompt to generate the response.
+
+---
 
 ## 📂 Project Structure
 
 ```text
 backend/
 ├── scripts/
-│   └── automate_workflow.ts        # 🚀 Master automation script (IR -> Transform -> Ingest)
+│   └── automate_workflow.ts        # 🚀 Orchestrates Phase 1 -> Phase 3
 ├── src/
-│   ├── index.ts                    # Main Express server entry point
-│   ├── api/                        # Route Controllers (Request/Response handling)
-│   │   ├── frontend-ir.controller.ts
-│   │   ├── backend-ir.controller.ts
-│   │   ├── transform.controller.ts
-│   │   ├── ingest.controller.ts
-│   │   └── query.controller.ts     # Intelligent query routing with Intent Classification
-│   ├── ir-generation/              # AST Analysis & IR Generation Logic
-│   │   ├── backend-processor.ts    # Node.js/TypeScript code analysis
-│   │   ├── frontend-processor.ts   # Vue/Frontend code analysis
-│   │   ├── extractors/            # Low-level AST node extractors
-│   │   ├── analyzers/             # Higher-level logic analysis
-│   │   └── builders/               # IR builders
-│   └── rag-processing/             # AI & Vector DB Integration
-│       ├── transform.ts            # Gemini-powered IR simplification
-│       ├── ingest.ts               # LanceDB embedding and storage
-│       ├── query.ts                # Groq-powered RAG and Intent Classification
-│       └── types.ts                # Shared TypeScript interfaces
-├── lancedb_data/                   # Local LanceDB vector storage
-└── swagger.yaml                    # OpenAPI/Swagger API documentation
+│   ├── index.ts                    # Entry point & API Routing
+│   ├── api/                        # Request Handlers (Controllers)
+│   ├── ir-generation/              # Phase 1: Static Analysis (Tree-sitter)
+│   └── rag-processing/             # Phase 2-5: AI & Vector Logic (Gemini/Groq/LanceDB)
+├── lancedb_data/                   # Local Vector Database Files
+└── swagger.yaml                    # API Specs (accessible via /api-docs)
 ```
 
-## 🛠️ Setup
+## 🛠️ Getting Started
 
-1.  **Install dependencies**:
-    ```bash
-    npm install
-    ```
-2.  **Environment Variables**:
-    Create a `.env` file based on `.env.example`:
-    ```makefile
-    PORT=3001
-    GOOGLE_API_KEY=your_gemini_api_key
-    GROQ_API_KEY=your_groq_api_key
-    ```
+1.  **Install**: `npm install`
+2.  **Environment**: Configure `.env` with your `GOOGLE_API_KEY` and `GROQ_API_KEY`.
+3.  **Run Server**: `npm run dev` (Starts on port 3001)
 
-## 🚀 How to Run
+## ⚡ Running the Pipeline
 
-### 1. Start the Backend Server
-This must be running for the automation or queries to work.
-```bash
-npm run dev
-```
-*Server will start on `http://localhost:3001`*
-
-### 2. Automate the Entire Workflow
-We provide a master script that automatically detects your `client` and `server` folders, generates IRs, transforms them into AI-friendly formats, and ingests them into the Vector DB.
-
-**Run this in a separate terminal:**
+To process your entire project at once, run the automation script:
 ```bash
 npx ts-node scripts/automate_workflow.ts
 ```
 
-### 3. Query the Knowledge Base
-You can now ask questions about your codebase. The system uses an **AI Intent Classifier** to automatically route your question to the correct documentation (Frontend vs Backend).
+Once complete, you can send POST requests to `/api/query` and the AI will automatically route your questions to the correct context!
 
-**Example Query:**
-```bash
-curl -X POST http://localhost:3001/api/query \
-  -H "Content-Type: application/json" \
-  -d '{"query": "How do I change the button color?"}'
-```
-
-## 📚 API Documentation
-Comprehensive API documentation is available via Swagger UI when the server is running:
-`http://localhost:3001/api-docs`
 
