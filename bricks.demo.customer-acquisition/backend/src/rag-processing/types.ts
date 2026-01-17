@@ -40,10 +40,17 @@ export interface FrontendTransformedElement {
 
 export interface BackendTransformedElement {
   name: string;
-  type: 'module' | 'controller' | 'service' | 'dto';
+  type: 'module' | 'controller' | 'service' | 'dto' | 'architecture';
   summary: string;
   technicalDetails: string[]; // endpoints, methods, or fields
   dependencies: string[]; // imports, injected services
+  invokes?: string[];
+  interface?: 'graphql' | 'rest';
+  security?: {
+    authRequired: boolean;
+    guards: string[];
+  };
+  capabilities?: string[];
 }
 
 export type TransformedElement = FrontendTransformedElement | BackendTransformedElement;

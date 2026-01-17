@@ -3,3 +3,5 @@ dist/
 .env
 lancedb_data/
 *.log
+backend-simplified.json
+frontend-simplified.json
