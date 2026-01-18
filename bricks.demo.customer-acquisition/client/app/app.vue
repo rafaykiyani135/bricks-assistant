@@ -1,24 +1,18 @@
+
 <template>
   <UApp>
-    <ArkHeader></ArkHeader>
+    <BrkHeader :isLoggedIn="false" />
     <UMain>
       <NuxtLayout>
-        <AppLoading v-if="auth.isInitializing" />
-        <NuxtPage v-else />
+        <NuxtPage />
+        <!-- The content of your brick would go here -->
+        <BrkSection />
+        <BrkCard />
       </NuxtLayout>
     </UMain>
   </UApp>
 </template>
 
 <script setup lang="ts">
-  import AppLoading from './components/AppLoading.vue';
-  import ArkHeader from './components/ArkHeader.vue';
-  import { useAuthStore } from './stores/auth';
-
-  const auth = useAuthStore();
+  import BrkHeader from './components/BrkHeader.vue';
 </script>
-
-<style>
-  @import 'tailwindcss';
-  @import '@nuxt/ui';
-</style>

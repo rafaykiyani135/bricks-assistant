@@ -71,7 +71,7 @@ USER QUESTION: "${query}"
     }
 }
 
-export async function queryKnowledgeBase(query: string, tableName: string = 'frontend_knowledge_base_v1'): Promise<QueryResult> {
+export async function queryKnowledgeBase(query: string, tableName: string = 'frontend_knowledge_base_v1', history: string[] = []): Promise<QueryResult> {
     const dbDir = path.resolve(__dirname, '../../lancedb_data');
     if (!fs.existsSync(dbDir)) {
         throw new Error(`Database directory not found at ${dbDir}. Please run ingestion first.`);
@@ -100,7 +100,7 @@ export async function queryKnowledgeBase(query: string, tableName: string = 'fro
     }
 
     const retrievedContexts = results.map((r: any) => r.text);
-    const answer = await generateAnswer(query, retrievedContexts);
+    const answer = await generateAnswer(query, retrievedContexts, history);
 
     return {
         answer,
@@ -116,7 +116,7 @@ export async function queryKnowledgeBase(query: string, tableName: string = 'fro
 /**
  * Hybrid search across Frontend and Specs tables
  */
-export async function queryHybridFrontendSpecs(query: string): Promise<QueryResult> {
+export async function queryHybridFrontendSpecs(query: string, history: string[] = []): Promise<QueryResult> {
     const dbDir = path.resolve(__dirname, '../../lancedb_data');
     if (!fs.existsSync(dbDir)) {
         throw new Error(`Database directory not found at ${dbDir}. Please run ingestion first.`);
@@ -157,7 +157,7 @@ export async function queryHybridFrontendSpecs(query: string): Promise<QueryResu
     }
 
     const retrievedContexts = topResults.map((r: any) => r.text);
-    const answer = await generateAnswer(query, retrievedContexts);
+    const answer = await generateAnswer(query, retrievedContexts, history);
 
     return {
         answer,
@@ -171,16 +171,25 @@ export async function queryHybridFrontendSpecs(query: string): Promise<QueryResu
     };
 }
 
-async function generateAnswer(query: string, contexts: string[]): Promise<string> {
+async function generateAnswer(query: string, contexts: string[], history: string[] = []): Promise<string> {
     const contextBlock = contexts.join("\n\n---\n\n");
+    const historyBlock = history.length > 0 
+        ? `\nPREVIOUS CONVERSATION HISTORY:\n${history.join('\n')}\n` 
+        : "";
+
     const prompt = `
-  You are a helpful assistant for a development team.
-  Use the following context snippets from the project's documentation/codebase to answer the user's question.
-  
-  If the context doesn't contain the answer, say "I don't have enough information in the provided context." but try your best to infer from what is there.
-  
+  You are a professional Project Consultant. Your goal is to answer questions about the software in a clear, concise way that a business owner or non-technical user would immediately understand.
+
+  CRITICAL RULES:
+  1. **Business Features Only**: When asked about "features", DO NOT list technical components like "Wrappers", "Headers", "Redirection pages", or "Modals". Instead, group them into high-level business capabilities (e.g., "Customer Relationship Management", "Contact Management").
+  2. **Concise & Direct**: Give a short 1-2 sentence summary first. Use bullet points for details only if necessary. Avoid long explanations of how the app is structured.
+  3. **No Jargon**: Do not mention "APIs", "Components", "Frontend/Backend", or "JSON". Use words like "Service", "Screen", "Information", or "Feature".
+  4. **Strict Context**: Answer ONLY based on the provided context. If the context describes a technical component, translate its purpose into a user benefit.
+
   CONTEXT:
   ${contextBlock}
+
+  ${historyBlock}
   
   USER QUESTION:
   ${query}

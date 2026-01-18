@@ -1,0 +1,89 @@
+/* @import url("https://fonts.googleapis.com/css2?family=Rubik:ital@0;1&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap") */
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+:root {
+  --ui-bg: var(--color-neutral-950);
+  --ui-text: var(--color-neutral-50);
+  --ui-text-highlighted: var(--color-neutral-50);
+  --ui-border: var(--color-brand-primary);
+  --ui-primary: var(--color-brand-primary);
+}
+
+.dark {
+  --ui-bg: var(--color-neutral-950);
+  --ui-border: var(--color-brand-primary);
+}
+@theme {
+  /* No need to indicate fallbacks, nextui fonts does it for us. See console for proof */
+  --font-sans: "IBM Plex Mono";
+  --font-mono: "IBM Plex Mono";
+  --font-headings: "Rubik";
+
+  --color-brand-primary: var(--color-cyan-400);
+  --color-brand-gradient-1: var(--color-cyan-300);
+  --color-brand-gradient-2: var(--color-cyan-200);
+  --color-brand-gradient-3: var(--color-cyan-100);
+  --color-brand-gradient-4: var(--color-cyan-50);
+
+
+  --color-neutral-50: #F4F5F7;
+  --color-neutral-100: #F4F5F7;
+  --color-neutral-200: oklch(0.922 0 0);
+  --color-neutral-300: oklch(0.87 0 0);
+  --color-neutral-400: oklch(0.708 0 0);
+  --color-neutral-500: oklch(0.556 0 0);
+  --color-neutral-600: oklch(0.439 0 0);
+  --color-neutral-700: oklch(0.371 0 0);
+  --color-neutral-800: oklch(0.269 0 0);
+  --color-neutral-900: #2C2C2E;
+  --color-neutral-950: #2C2C2E;
+
+  --color-cyan-50: #E0FFFF;
+  --color-cyan-100: #C1FFFF;
+  --color-cyan-200: #A2FFFF;
+  --color-cyan-300: #83FFFF;
+  --color-cyan-400: #64FFFF;
+  --color-cyan-500: #64FFFF;
+  --color-cyan-600: #64FFFF;
+  --color-cyan-700: #64FFFF;
+  --color-cyan-800: #64FFFF;
+  --color-cyan-900: #64FFFF;
+  --color-cyan-950: #64FFFF;
+
+   --color-green-50: #E3FAE3;
+  --color-green-100: #C6F5C7;
+  --color-green-200: #AAF0AB;
+  --color-green-300: #8DEB8F;
+  --color-green-400: #71E673;
+  --color-green-500: #71E673;
+  --color-green-600: #71E673;
+  --color-green-700: #71E673;
+  --color-green-800: #71E673;
+  --color-green-900: #71E673;
+  --color-green-950: #71E673;
+
+  --color-yellow-50: #FFFAD6;
+  --color-yellow-100: #FFF4AD;
+  --color-yellow-200: #FEEF85;
+  --color-yellow-300: #FEE95C;
+  --color-yellow-400: #FEE433;
+  --color-yellow-500: #FEE433;
+  --color-yellow-600: #FEE433;
+  --color-yellow-700: #FEE433;
+  --color-yellow-800: #FEE433;
+  --color-yellow-900: #FEE433;
+  --color-yellow-950: #FEE433;
+
+  --color-red-50: #FFE4E2;
+  --color-red-100: #FFCAC6;
+  --color-red-200: #FFAFA9;
+  --color-red-300: #FF958D;
+  --color-red-400: #FF7A70;
+  --color-red-500: #FF7A70;
+  --color-red-600: #FF7A70;
+  --color-red-700: #FF7A70;
+  --color-red-800: #FF7A70;
+  --color-red-900: #FF7A70;
+  --color-red-950: #FF7A70;
+}

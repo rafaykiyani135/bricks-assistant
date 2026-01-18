@@ -3,7 +3,7 @@ import { queryKnowledgeBase, classifyIntent, queryHybridFrontendSpecs } from '..
 
 export async function queryKB(req: Request, res: Response) {
     try {
-        const { query, tableName } = req.body;
+        const { query, tableName, history } = req.body;
 
         if (!query) {
             return res.status(400).json({ error: 'Query string is required' });
@@ -34,8 +34,8 @@ export async function queryKB(req: Request, res: Response) {
         }
 
         const result = targetTable === 'HYBRID_FRONTEND_SPECS'
-            ? await queryHybridFrontendSpecs(query)
-            : await queryKnowledgeBase(query, targetTable);
+            ? await queryHybridFrontendSpecs(query, history)
+            : await queryKnowledgeBase(query, targetTable, history);
 
         res.json(result);
     } catch (error: any) {

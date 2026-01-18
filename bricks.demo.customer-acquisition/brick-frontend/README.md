@@ -1,18 +1,6 @@
-# Description
+# Nuxt Minimal Starter
 
-This project aims at receiving Brickcode's bricks, while giving them a common look and feel.
-To achieve this we use ready-made components from the [Nuxt UI library](https://ui.nuxt.com/docs/components).
-
-You can launch the project to see what components look like. You're welcome to cherry-pick some of the components, or take other ones from Nuxt UI.
-
-We don't encourage you to customize a component's style too much.
-Ideally, the only thing left you'd have to do would be positioning them in your layout.
-
-## Contribution
-
-Feel free to add components you believe could be useful elsewhere.
-
-Please advise us via PR/MR and we'll review asap.
+Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
 ## Setup
 
