@@ -1,0 +1,791 @@
+{
+  "elements": [
+    {
+      "name": "AppModule",
+      "type": "module",
+      "file": "src/app.module.ts",
+      "summary": "This is the root module of the application, responsible for bootstrapping the entire NestJS application. It orchestrates the integration of core functionalities such as database connectivity, GraphQL API exposure, and authentication services.",
+      "technicalDetails": [
+        "AppController"
+      ],
+      "dependencies": [
+        "TypeOrmModule",
+        "GqlModule",
+        "AuthModule"
+      ],
+      "capabilities": [
+        "Bootstrap the application",
+        "Expose a root API endpoint",
+        "Connect to the database",
+        "Integrate GraphQL services"
+      ]
+    },
+    {
+      "name": "AuthModule",
+      "type": "module",
+      "file": "src/auth/auth.module.ts",
+      "summary": "This module handles all authentication and authorization logic for the application. It provides services for user authentication, specifically implementing a Google OAuth strategy, and relies on employee data for user validation.",
+      "technicalDetails": [
+        "AuthController",
+        "AuthService",
+        "GoogleStrategy"
+      ],
+      "dependencies": [
+        "EmployeesModule"
+      ],
+      "capabilities": [
+        "Handle user authentication via HTTP",
+        "Implement Google OAuth strategy",
+        "Provide authentication services"
+      ]
+    },
+    {
+      "name": "ContactPointsModule",
+      "type": "module",
+      "file": "src/contact-points/contact-points.module.ts",
+      "summary": "This module is responsible for managing all data related to contact points within the application. It provides services for CRUD operations, GraphQL resolution for contact point queries and mutations, and efficient data loading mechanisms, making its core services available to other modules.",
+      "technicalDetails": [
+        "ContactPointsService",
+        "ContactPointsResolver",
+        "ContactPointsLoader"
+      ],
+      "dependencies": [
+        "TypeOrmModule",
+        "InteractionSummariesModule"
+      ],
+      "capabilities": [
+        "Manage contact point data",
+        "Resolve contact point GraphQL queries/mutations",
+        "Provide efficient data loading for contact points",
+        "Expose contact point services for other modules"
+      ]
+    },
+    {
+      "name": "CustomersModule",
+      "type": "module",
+      "file": "src/customers/customers.module.ts",
+      "summary": "This module manages all customer-related data and business logic. It offers services for performing CRUD operations on customer records and provides GraphQL resolvers to expose customer data through the GraphQL API, making its core service accessible to other parts of the application.",
+      "technicalDetails": [
+        "CustomersService",
+        "CustomersResolver"
+      ],
+      "dependencies": [
+        "TypeOrmModule"
+      ],
+      "capabilities": [
+        "Manage customer data",
+        "Resolve customer GraphQL queries/mutations",
+        "Expose customer services for other modules"
+      ]
+    },
+    {
+      "name": "EmployeesModule",
+      "type": "module",
+      "file": "src/employees/employees.module.ts",
+      "summary": "This module is dedicated to managing employee data and associated business logic. It provides services for handling employee records and GraphQL resolvers to expose employee information via the GraphQL API, making its core service available for use by other modules.",
+      "technicalDetails": [
+        "EmployeesService",
+        "EmployeesResolver"
+      ],
+      "dependencies": [
+        "TypeOrmModule"
+      ],
+      "capabilities": [
+        "Manage employee data",
+        "Resolve employee GraphQL queries/mutations",
+        "Expose employee services for other modules"
+      ]
+    },
+    {
+      "name": "GqlModule",
+      "type": "module",
+      "file": "src/graphql/graphql.module.ts",
+      "summary": "This module serves as the central orchestrator for the application's GraphQL API. It aggregates GraphQL schemas and resolvers from various domain-specific modules, providing a unified GraphQL endpoint for client applications to interact with.",
+      "technicalDetails": [],
+      "dependencies": [
+        "GraphQLModule",
+        "HelloModule",
+        "CustomersModule",
+        "ContactPointsModule",
+        "EmployeesModule",
+        "InteractionSummariesModule"
+      ],
+      "capabilities": [
+        "Aggregate GraphQL schemas from various domain modules",
+        "Provide a unified GraphQL API endpoint"
+      ]
+    },
+    {
+      "name": "HelloModule",
+      "type": "module",
+      "file": "src/hello/hello.module.ts",
+      "summary": "This module provides a basic 'hello world' functionality, likely used for initial setup, testing, or demonstrating a simple GraphQL endpoint. It includes a service for basic logic and a resolver to expose this functionality via GraphQL.",
+      "technicalDetails": [
+        "HelloResolver",
+        "HelloService"
+      ],
+      "dependencies": [
+        "TypeOrmModule"
+      ],
+      "capabilities": [
+        "Provide a basic \"hello world\" GraphQL endpoint",
+        "Demonstrate basic service interaction"
+      ]
+    },
+    {
+      "name": "InteractionSummariesModule",
+      "type": "module",
+      "file": "src/interaction-summaries/interaction-summaries.module.ts",
+      "summary": "This module is responsible for managing interaction summary data within the application. It offers services for CRUD operations, GraphQL resolution for interaction summary queries and mutations, and efficient data loading, making its core services available to other modules.",
+      "technicalDetails": [
+        "InteractionSummariesService",
+        "InteractionSummariesResolver",
+        "InteractionSummariesLoader"
+      ],
+      "dependencies": [
+        "TypeOrmModule"
+      ],
+      "capabilities": [
+        "Manage interaction summary data",
+        "Resolve interaction summary GraphQL queries/mutations",
+        "Provide efficient data loading for interaction summaries",
+        "Expose interaction summary services for other modules"
+      ]
+    },
+    {
+      "name": "AppController",
+      "type": "controller",
+      "interface": "rest",
+      "file": "src/app.controller.ts",
+      "summary": "This controller provides a basic health check endpoint for the application.",
+      "technicalDetails": [
+        "GET / - Returns a simple 'Hello World' message to verify application status."
+      ],
+      "dependencies": [],
+      "invokes": [],
+      "security": {
+        "authRequired": false,
+        "guards": []
+      },
+      "capabilities": [
+        "Verify application health and responsiveness"
+      ]
+    },
+    {
+      "name": "AuthController",
+      "type": "controller",
+      "interface": "rest",
+      "file": "src/auth/auth.controller.ts",
+      "summary": "This controller manages user authentication flows, including Google OAuth integration, session management, and token refresh mechanisms.",
+      "technicalDetails": [
+        "GET /auth/google - Initiates the Google OAuth login process. (Protected by AuthGuard(google))",
+        "GET /auth/google/callback - Handles the callback from Google OAuth, processes user login, and sets authentication cookies. (Protected by AuthGuard(google))",
+        "GET /auth/me - Retrieves the profile information of the currently authenticated user.",
+        "GET /auth/refresh - Refreshes the user's access token using a refresh token.",
+        "POST /auth/logout - Logs out the user by clearing authentication cookies."
+      ],
+      "dependencies": [
+        "AuthService"
+      ],
+      "invokes": [
+        "AuthService.handleGoogleLogin",
+        "AuthService.getAuthState",
+        "AuthService.refreshAccessToken"
+      ],
+      "security": {
+        "authRequired": true,
+        "guards": [
+          "AuthGuard(google)"
+        ]
+      },
+      "capabilities": [
+        "Authenticate users via Google OAuth",
+        "Manage user sessions and tokens",
+        "Retrieve current user profile",
+        "Refresh access tokens",
+        "Log out users"
+      ]
+    },
+    {
+      "name": "ContactPointsResolver",
+      "type": "resolver",
+      "interface": "graphql",
+      "file": "src/contact-points/contact-points.resolver.ts",
+      "summary": "This resolver provides GraphQL operations for managing contact points and resolving related customer and interaction data.",
+      "technicalDetails": [
+        "Mutation createContactPoint - Creates a new contact point.",
+        "Mutation updateContactPoint - Updates an existing contact point by ID.",
+        "Mutation deleteContactPoint - Deletes a contact point by ID.",
+        "ResolveField customer - Resolves the associated customer for a given contact point.",
+        "ResolveField interactions - Resolves the interaction summaries related to a contact point."
+      ],
+      "dependencies": [
+        "ContactPointsService",
+        "CustomersService",
+        "InteractionSummariesLoader"
+      ],
+      "invokes": [
+        "ContactPointsService.create",
+        "ContactPointsService.update",
+        "ContactPointsService.delete",
+        "CustomersService.findOne",
+        "InteractionSummariesLoader.load"
+      ],
+      "security": {
+        "authRequired": false,
+        "guards": []
+      },
+      "capabilities": [
+        "Create, update, and delete contact points",
+        "Retrieve associated customer data for contact points",
+        "Retrieve interaction summaries linked to contact points"
+      ]
+    },
+    {
+      "name": "CustomersResolver",
+      "type": "resolver",
+      "interface": "graphql",
+      "file": "src/customers/customers.resolver.ts",
+      "summary": "This resolver offers GraphQL queries and mutations for managing customer data and resolving related entities like contact points and interaction summaries.",
+      "technicalDetails": [
+        "Query customer - Retrieves a single customer by ID.",
+        "Query customers - Retrieves a list of all customers.",
+        "Mutation createCustomer - Creates a new customer record.",
+        "Mutation updateCustomer - Updates an existing customer record by ID.",
+        "Mutation deleteCustomer - Deletes a customer record by ID.",
+        "ResolveField contactPoints - Resolves all contact points associated with a customer.",
+        "ResolveField lastInteraction - Resolves the most recent interaction for a customer.",
+        "ResolveField interactionCount - Resolves the total number of interactions for a customer."
+      ],
+      "dependencies": [
+        "CustomersService",
+        "ContactPointsLoader",
+        "InteractionSummariesLoader"
+      ],
+      "invokes": [
+        "CustomersService.findOne",
+        "CustomersService.findAll",
+        "CustomersService.create",
+        "CustomersService.update",
+        "CustomersService.delete",
+        "ContactPointsLoader.load",
+        "InteractionSummariesLoader.load"
+      ],
+      "security": {
+        "authRequired": false,
+        "guards": []
+      },
+      "capabilities": [
+        "Query and retrieve customer information",
+        "Create, update, and delete customer records",
+        "Resolve associated contact points for customers",
+        "Calculate and retrieve interaction summaries for customers"
+      ]
+    },
+    {
+      "name": "EmployeesResolver",
+      "type": "resolver",
+      "interface": "graphql",
+      "file": "src/employees/employees.resolver.ts",
+      "summary": "This resolver provides GraphQL operations for querying and managing employee data.",
+      "technicalDetails": [
+        "Query employee - Retrieves a single employee by ID.",
+        "Query employees - Retrieves a list of all employees.",
+        "Mutation createEmployee - Creates a new employee record.",
+        "Mutation updateEmployee - Updates an existing employee record by ID.",
+        "ResolveField interactions - Resolves interactions related to an employee."
+      ],
+      "dependencies": [
+        "EmployeesService"
+      ],
+      "invokes": [
+        "EmployeesService.findOne",
+        "EmployeesService.findAll",
+        "EmployeesService.create",
+        "EmployeesService.update"
+      ],
+      "security": {
+        "authRequired": false,
+        "guards": []
+      },
+      "capabilities": [
+        "Query and retrieve employee information",
+        "Create and update employee records",
+        "Resolve associated interactions for employees"
+      ]
+    },
+    {
+      "name": "HelloResolver",
+      "type": "resolver",
+      "interface": "graphql",
+      "file": "src/hello/hello.resolver.ts",
+      "summary": "This resolver provides a basic GraphQL query for a 'Hello World' message.",
+      "technicalDetails": [
+        "Query getHello - Returns a simple greeting message."
+      ],
+      "dependencies": [
+        "HelloService"
+      ],
+      "invokes": [
+        "HelloService.getHello"
+      ],
+      "security": {
+        "authRequired": false,
+        "guards": []
+      },
+      "capabilities": [
+        "Provide a basic greeting message"
+      ]
+    },
+    {
+      "name": "InteractionSummariesResolver",
+      "type": "resolver",
+      "interface": "graphql",
+      "file": "src/interaction-summaries/interaction-summaries.resolver.ts",
+      "summary": "This resolver offers GraphQL mutations for creating interaction summaries and resolves specific fields within them.",
+      "technicalDetails": [
+        "Mutation createInteractionSummary - Creates a new interaction summary record.",
+        "ResolveField date - Formats the date field of an interaction summary."
+      ],
+      "dependencies": [
+        "InteractionSummariesService"
+      ],
+      "invokes": [
+        "InteractionSummariesService.create"
+      ],
+      "security": {
+        "authRequired": false,
+        "guards": []
+      },
+      "capabilities": [
+        "Create new interaction summaries",
+        "Format interaction summary dates for display"
+      ]
+    },
+    {
+      "name": "AuthService",
+      "type": "service",
+      "file": "src/auth/auth.service.ts",
+      "summary": "This service manages user authentication and authorization processes. It handles user login via external providers (like Google), issues and refreshes access tokens, and verifies user identity for secure access to the system.",
+      "technicalDetails": [
+        "handleGoogleLogin (async) - Processes a Google user's login, either finding an existing employee or creating a new one, then generates a JWT for authentication.",
+        "refreshAccessToken - Verifies a refresh token and issues a new access token to maintain user sessions without requiring re-login.",
+        "getAuthState (async) - Validates an access token and retrieves the associated employee's details to determine the current authentication state."
+      ],
+      "dependencies": [
+        "EmployeesService",
+        "JWT (implicit)"
+      ],
+      "invokes": [
+        "employees.findByEmail",
+        "employees.create",
+        "jwt.sign",
+        "jwt.verify",
+        "employees.findOne"
+      ],
+      "capabilities": [
+        "User authentication via Google OAuth",
+        "JWT token generation and validation",
+        "Session management (refreshing tokens)",
+        "Retrieving current user authentication status"
+      ]
+    },
+    {
+      "name": "GoogleStrategy",
+      "type": "service",
+      "file": "src/auth/google.strategy.ts",
+      "summary": "This service implements the Google OAuth 2.0 authentication strategy, acting as an intermediary to process and validate user profiles received from Google after a successful login.",
+      "technicalDetails": [
+        "validate - Processes the Google profile data received during the OAuth callback, preparing it for further authentication steps."
+      ],
+      "dependencies": [
+        "Passport.js (implicit)"
+      ],
+      "invokes": [],
+      "capabilities": [
+        "Integrate with Google OAuth for user authentication",
+        "Validate Google user profiles"
+      ]
+    },
+    {
+      "name": "GqlAuthGuard",
+      "type": "service",
+      "file": "src/common/guards/gql-auth.guard.ts",
+      "summary": "This GraphQL authentication guard protects GraphQL resolvers by validating the access token provided in the request header. It ensures that only authenticated users can access protected resources.",
+      "technicalDetails": [
+        "canActivate - Determines if the current request is authorized by extracting and verifying the JWT from the GraphQL context's authorization header."
+      ],
+      "dependencies": [
+        "JWT (implicit)",
+        "GqlExecutionContext (implicit)"
+      ],
+      "invokes": [
+        "GqlExecutionContext.create",
+        "ctx.getContext",
+        "authHeader.replace",
+        "jwt.verify"
+      ],
+      "capabilities": [
+        "Protect GraphQL endpoints",
+        "Validate JWT access tokens from request headers",
+        "Enforce authentication for GraphQL operations"
+      ]
+    },
+    {
+      "name": "ContactPointsLoader",
+      "type": "service",
+      "file": "src/contact-points/contact-points.loader.ts",
+      "summary": "This data loader is specifically designed to efficiently fetch contact points for a given customer ID. It optimizes data retrieval by batching requests, primarily used to solve N+1 query problems in GraphQL.",
+      "technicalDetails": [
+        "load - Initiates the loading of contact points for a specific customer ID, leveraging a batching mechanism to fetch multiple contact points in a single query."
+      ],
+      "dependencies": [
+        "ContactPointsService"
+      ],
+      "invokes": [
+        "loader.load"
+      ],
+      "capabilities": [
+        "Batch loading of contact points by customer ID",
+        "Optimize data fetching for related entities (e.g., in GraphQL)"
+      ]
+    },
+    {
+      "name": "ContactPointsService",
+      "type": "service",
+      "file": "src/contact-points/contact-points.service.ts",
+      "summary": "This service manages all operations related to 'Contact Points', which represent individual points of contact for customers. It handles the full lifecycle (CRUD) of contact points, ensuring data integrity and uniqueness constraints.",
+      "technicalDetails": [
+        "findByCustomerId (async) - Retrieves all contact points associated with a specific customer ID.",
+        "findByCustomerIds (async) - Retrieves contact points for multiple customer IDs in a batched manner, returning them grouped by customer ID for efficient data loading.",
+        "findByNameAndCustomerId (async) - Finds a contact point by its name and the associated customer ID, used to enforce uniqueness within a customer's context.",
+        "findByEmailAndCustomerId (async) - Finds a contact point by its email and the associated customer ID, used to enforce uniqueness within a customer's context.",
+        "create (async) - Creates a new contact point, performing checks to ensure its name and email are unique for the given customer before saving.",
+        "update (async) - Updates an existing contact point, including uniqueness checks for name and email if they are modified, and verifies the contact point's existence.",
+        "delete (async) - Deletes a contact point by its ID after verifying its existence."
+      ],
+      "dependencies": [
+        "Repository<ContactPoint>"
+      ],
+      "invokes": [
+        "contactPointsRepository.find",
+        "contactPointsRepository.createQueryBuilder",
+        "contactPointsRepository.save",
+        "contactPointsRepository.create",
+        "contactPointsRepository.findOneBy",
+        "contactPointsRepository.remove",
+        "findByEmailAndCustomerId",
+        "findByNameAndCustomerId",
+        "getOne",
+        "andWhere",
+        "where",
+        "name.trim",
+        "email.trim",
+        "contactPoints.reduce",
+        "push"
+      ],
+      "capabilities": [
+        "Manage contact point lifecycle (CRUD)",
+        "Enforce uniqueness on contact point name and email per customer",
+        "Batch retrieve contact points for multiple customers",
+        "Query contact points by various criteria"
+      ]
+    },
+    {
+      "name": "CustomersService",
+      "type": "service",
+      "file": "src/customers/customers.service.ts",
+      "summary": "This service handles all business logic related to customer entities, including their creation, retrieval, update, and deletion. It ensures data integrity and provides methods to manage customer records.",
+      "technicalDetails": [
+        "findAll (async) - Retrieves all customer records from the database.",
+        "findOne (async) - Retrieves a single customer by their unique ID.",
+        "findByName (async) - Finds a customer by their name, used to enforce uniqueness or retrieve a specific customer.",
+        "create (async) - Creates a new customer record, performing checks to ensure the customer name is unique before saving.",
+        "update (async) - Updates an existing customer record, including uniqueness checks for the customer name if it's modified, and verifies the customer's existence.",
+        "delete (async) - Deletes a customer record by its ID after verifying its existence."
+      ],
+      "dependencies": [
+        "Repository<Customer>"
+      ],
+      "invokes": [
+        "repo.find",
+        "repo.findOneBy",
+        "repo.createQueryBuilder",
+        "repo.save",
+        "repo.create",
+        "repo.remove",
+        "findByName",
+        "findOne",
+        "getOne",
+        "where",
+        "name.trim"
+      ],
+      "capabilities": [
+        "Manage customer lifecycle (CRUD)",
+        "Enforce uniqueness on customer names",
+        "Retrieve customers by ID or name"
+      ]
+    },
+    {
+      "name": "EmployeesService",
+      "type": "service",
+      "file": "src/employees/employees.service.ts",
+      "summary": "This service manages all operations related to employee entities, including their creation, retrieval, and update. It serves as the central point for managing internal user accounts within the system.",
+      "technicalDetails": [
+        "findAll (async) - Retrieves all employee records from the database.",
+        "findOne (async) - Retrieves a single employee by their unique ID.",
+        "findByEmail (async) - Finds an employee by their email address, typically used for login or unique identification.",
+        "create (async) - Creates a new employee record.",
+        "update (async) - Updates an existing employee record after verifying its existence."
+      ],
+      "dependencies": [
+        "Repository<Employee>"
+      ],
+      "invokes": [
+        "repo.find",
+        "repo.findOneBy",
+        "repo.create",
+        "repo.save",
+        "findOne"
+      ],
+      "capabilities": [
+        "Manage employee lifecycle (CRUD, excluding delete)",
+        "Retrieve employees by ID or email"
+      ]
+    },
+    {
+      "name": "HelloService",
+      "type": "service",
+      "file": "src/hello/hello.service.ts",
+      "summary": "This is a simple service likely used for basic health checks or introductory API endpoints. Its primary purpose is to provide a basic response, potentially interacting with a 'Hello' entity for personalized greetings or data retrieval.",
+      "technicalDetails": [
+        "getHello (async) - Retrieves a 'Hello' entity by name, possibly for a personalized greeting or simple data retrieval."
+      ],
+      "dependencies": [
+        "Repository<Hello>"
+      ],
+      "invokes": [
+        "repo.findOneBy"
+      ],
+      "capabilities": [
+        "Provide basic API responses",
+        "Retrieve simple data based on a name"
+      ]
+    },
+    {
+      "name": "InteractionSummariesLoader",
+      "type": "service",
+      "file": "src/interaction-summaries/interaction-summaries.loader.ts",
+      "summary": "This data loader is designed to efficiently fetch interaction summaries for a given contact point ID. It optimizes data retrieval by batching requests, primarily used to prevent N+1 query issues in GraphQL.",
+      "technicalDetails": [
+        "load - Initiates the loading of interaction summaries for a specific contact point ID, utilizing a batching mechanism to fetch multiple summaries in a single query."
+      ],
+      "dependencies": [
+        "InteractionSummariesService"
+      ],
+      "invokes": [
+        "loader.load"
+      ],
+      "capabilities": [
+        "Batch loading of interaction summaries by contact point ID",
+        "Optimize data fetching for related entities"
+      ]
+    },
+    {
+      "name": "InteractionSummariesService",
+      "type": "service",
+      "file": "src/interaction-summaries/interaction-summaries.service.ts",
+      "summary": "This service manages all operations related to 'Interaction Summaries', which record details of interactions with contact points. It handles the creation of new summaries and their retrieval based on associated contact points.",
+      "technicalDetails": [
+        "create (async) - Creates a new interaction summary, associating it with a specific contact point and the employee who performed the interaction.",
+        "findByContactPointId (async) - Retrieves all interaction summaries associated with a specific contact point ID.",
+        "findByContactPointIds (async) - Retrieves interaction summaries for multiple contact point IDs in a batched manner, returning them grouped by contact point ID for efficient data loading."
+      ],
+      "dependencies": [
+        "Repository<InteractionSummary>"
+      ],
+      "invokes": [
+        "interactionSummariesRepository.create",
+        "interactionSummariesRepository.save",
+        "interactionSummariesRepository.find",
+        "interactionSummaries.reduce",
+        "push"
+      ],
+      "capabilities": [
+        "Create new interaction summaries",
+        "Retrieve interaction summaries by contact point",
+        "Batch retrieve interaction summaries for multiple contact points"
+      ]
+    },
+    {
+      "name": "CreateContactPointInput",
+      "type": "dto",
+      "file": "src/contact-points/dto/create-contact-point.dto.ts",
+      "summary": "Represents the data required to create a new contact point for a customer.",
+      "technicalDetails": [
+        "customerId (string, required): The unique identifier of the customer this contact point belongs to.",
+        "name (string, required): The name of the contact point.",
+        "role (string, optional): The role or title of the contact point.",
+        "email (string, optional): The email address of the contact point.",
+        "phone (string, optional): The phone number of the contact point.",
+        "override (boolean, optional): Indicates if existing contact point data should be overridden."
+      ],
+      "dependencies": [],
+      "capabilities": [
+        "Define schema for contact point creation",
+        "Validate input fields for contact point creation"
+      ]
+    },
+    {
+      "name": "UpdateContactPointInput",
+      "type": "dto",
+      "file": "src/contact-points/dto/update-contact-point.dto.ts",
+      "summary": "Represents the data required to update an existing contact point.",
+      "technicalDetails": [
+        "id (string, required): The unique identifier of the contact point to update.",
+        "name (string, optional): The new name of the contact point.",
+        "role (string, optional): The new role or title of the contact point.",
+        "email (string, optional): The new email address of the contact point.",
+        "phone (string, optional): The new phone number of the contact point."
+      ],
+      "dependencies": [],
+      "capabilities": [
+        "Define schema for contact point updates",
+        "Validate input fields for contact point updates"
+      ]
+    },
+    {
+      "name": "CreateCustomerInput",
+      "type": "dto",
+      "file": "src/customers/dto/create-customer.dto.ts",
+      "summary": "Represents the data required to create a new customer.",
+      "technicalDetails": [
+        "name (string, required): The name of the customer.",
+        "industry (string, optional): The industry the customer operates in.",
+        "website (string, optional): The official website URL of the customer.",
+        "override (boolean, optional): Indicates if existing customer data should be overridden."
+      ],
+      "dependencies": [],
+      "capabilities": [
+        "Define schema for customer creation",
+        "Validate input fields for customer creation"
+      ]
+    },
+    {
+      "name": "UpdateCustomerInput",
+      "type": "dto",
+      "file": "src/customers/dto/update-customer.dto.ts",
+      "summary": "Represents the data required to update an existing customer.",
+      "technicalDetails": [
+        "id (string, required): The unique identifier of the customer to update.",
+        "name (string, optional): The new name of the customer.",
+        "industry (string, optional): The new industry the customer operates in.",
+        "website (string, optional): The new official website URL of the customer."
+      ],
+      "dependencies": [],
+      "capabilities": [
+        "Define schema for customer updates",
+        "Validate input fields for customer updates"
+      ]
+    },
+    {
+      "name": "CreateEmployeeInput",
+      "type": "dto",
+      "file": "src/employees/dto/create-employee.dto.ts",
+      "summary": "Represents the data required to create a new employee.",
+      "technicalDetails": [
+        "name (string, required): The full name of the employee.",
+        "email (string, required): The email address of the employee."
+      ],
+      "dependencies": [],
+      "capabilities": [
+        "Define schema for employee creation",
+        "Validate input fields for employee creation"
+      ]
+    },
+    {
+      "name": "UpdateEmployeeInput",
+      "type": "dto",
+      "file": "src/employees/dto/update-employee.dto.ts",
+      "summary": "Represents the data required to update an existing employee.",
+      "technicalDetails": [
+        "id (string, required): The unique identifier of the employee to update.",
+        "name (string, optional): The new full name of the employee.",
+        "email (string, optional): The new email address of the employee."
+      ],
+      "dependencies": [],
+      "capabilities": [
+        "Define schema for employee updates",
+        "Validate input fields for employee updates"
+      ]
+    },
+    {
+      "name": "HelloQuery",
+      "type": "dto",
+      "file": "src/hello/hello.model.ts",
+      "summary": "Represents the data structure for a simple hello query.",
+      "technicalDetails": [
+        "message (string, required): A message to be included in the hello response."
+      ],
+      "dependencies": [],
+      "capabilities": [
+        "Define schema for hello query parameters",
+        "Validate input fields for hello query"
+      ]
+    },
+    {
+      "name": "CreateInteractionSummaryInput",
+      "type": "dto",
+      "file": "src/interaction-summaries/dto/create-interaction-summary.dto.ts",
+      "summary": "Represents the data required to create a new interaction summary.",
+      "technicalDetails": [
+        "contactPointId (string, required): The unique identifier of the contact point involved in the interaction.",
+        "date (string, required): The date of the interaction (e.g., YYYY-MM-DD).",
+        "type (string, required): The type of interaction (e.g., 'Call', 'Email', 'Meeting').",
+        "message (string, required): A summary or detailed message of the interaction."
+      ],
+      "dependencies": [],
+      "capabilities": [
+        "Define schema for interaction summary creation",
+        "Validate input fields for interaction summary creation"
+      ]
+    },
+    {
+      "name": "SystemArchitecture",
+      "type": "architecture",
+      "file": "N/A",
+      "summary": "The system is structured around a modular architecture, with distinct modules for core business domains like Authentication, Customers, Contact Points, Employees, and Interaction Summaries. Each module typically encapsulates its own resolvers (acting as controllers), services, and specialized data loaders. High-level flows involve resolvers delegating requests to their respective services. Critical dependencies highlight cross-module interactions, particularly where resolvers or services require data or functionality from other domains, such as authentication relying on employee data, or customer/contact point views aggregating information from multiple sources.",
+      "technicalDetails": [
+        "**High-Level Flows (Controller/Resolver to Service):**",
+        "- `AuthController` depends on `AuthService` for authentication logic.",
+        "- `ContactPointsResolver` depends on `ContactPointsService`, `CustomersService`, and `InteractionSummariesLoader` to resolve contact point related data.",
+        "- `CustomersResolver` depends on `CustomersService`, `ContactPointsLoader`, and `InteractionSummariesLoader` to resolve customer related data.",
+        "- `EmployeesResolver` depends on `EmployeesService` for employee data.",
+        "- `HelloResolver` depends on `HelloService` for a basic endpoint.",
+        "- `InteractionSummariesResolver` depends on `InteractionSummariesService` for interaction summary data.",
+        "",
+        "**Service-to-Service Dependencies:**",
+        "- `AuthService` critically depends on `EmployeesService`, indicating that authentication processes likely require access to employee information.",
+        "- `ContactPointsLoader` depends on `ContactPointsService`, suggesting the loader abstracts access to the core contact points service.",
+        "- `InteractionSummariesLoader` depends on `InteractionSummariesService`, similarly abstracting access to interaction summaries.",
+        "",
+        "**Module Boundaries:**",
+        "- **`AppModule`**: The root module, containing `AppController`.",
+        "- **`AuthModule`**: Encapsulates authentication concerns, including `AuthController`, `AuthService`, and `GoogleStrategy`.",
+        "- **`ContactPointsModule`**: Manages contact point entities, containing `ContactPointsService`, `ContactPointsResolver`, and `ContactPointsLoader`.",
+        "- **`CustomersModule`**: Manages customer entities, containing `CustomersService` and `CustomersResolver`.",
+        "- **`EmployeesModule`**: Manages employee entities, containing `EmployeesService` and `EmployeesResolver`.",
+        "- **`GqlModule`**: Likely handles GraphQL infrastructure, though no specific providers/controllers are listed in the provided data.",
+        "- **`HelloModule`**: A simple module for a 'hello world' type endpoint, with `HelloResolver` and `HelloService`.",
+        "- **`InteractionSummariesModule`**: Manages interaction summary entities, containing `InteractionSummariesService`, `InteractionSummariesResolver`, and `InteractionSummariesLoader`.",
+        "",
+        "**Critical Dependencies & Cross-Module Interactions:**",
+        "- `AuthModule` (via `AuthService`) depends on `EmployeesModule` (via `EmployeesService`).",
+        "- `ContactPointsModule` (via `ContactPointsResolver`) depends on `CustomersModule` (via `CustomersService`) and `InteractionSummariesModule` (via `InteractionSummariesLoader`).",
+        "- `CustomersModule` (via `CustomersResolver`) depends on `ContactPointsModule` (via `ContactPointsLoader`) and `InteractionSummariesModule` (via `InteractionSummariesLoader`).",
+        "- `ContactPointsLoader` and `InteractionSummariesLoader` act as internal data access layers within their respective modules, but are exposed for use by other resolvers (e.g., `CustomersResolver`)."
+      ],
+      "dependencies": []
+    }
+  ]
+}

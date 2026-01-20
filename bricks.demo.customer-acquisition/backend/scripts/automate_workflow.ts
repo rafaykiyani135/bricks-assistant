@@ -6,9 +6,9 @@ import * as dotenv from 'dotenv';
 
 dotenv.config({ path: path.resolve(__dirname, '../../backend/.env') });
 
-const API_BASE_URL = 'http://localhost:3001/api';
-const CLIENT_DIR = path.resolve(__dirname, '../../client');
-const SERVER_DIR = path.resolve(__dirname, '../../server');
+const API_BASE_URL = 'http://localhost:3005/api';
+const CLIENT_DIR = path.resolve(__dirname, '../../brick-frontend');
+const SERVER_DIR = path.resolve(__dirname, '../../brick-backend');
 const SPECS_DIR = path.resolve(__dirname, '../../spec');
 const RAW_IR_DIR = path.resolve(__dirname, '../raw_IR');
 

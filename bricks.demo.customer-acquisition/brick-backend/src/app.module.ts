@@ -1,26 +1,41 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
+// Quitamos configuración duplicada de GraphQL; se centraliza en GqlAppModule.
+import { join } from 'path';
+import { UsersModule } from './users/user.module';
 import { AuthModule } from './auth/auth.module';
-import { ContactPoint } from './contact-points/contact-points.model';
-import { Customer } from './customers/customers.model';
-import { Employee } from './employees/employees.model';
-import { GqlModule } from './graphql/graphql.module';
-import { Hello } from './hello/hello.model';
-import { InteractionSummary } from './interaction-summaries/interaction-summaries.model';
+import { EmployeeModule } from './employee/employee.module';
+import { JobModule } from './job/job.module';
+import { ProjectModule } from './project/project.module';
+import { Reflector } from '@nestjs/core';
+import { RolesGuard } from './auth/guard/roles.guard';
+import { GqlAppModule } from './graphql/graphql.module';
+import { EmployeeLoader } from './employee/employee.loader';
+import { SeedResolver } from './seed/seed.resolver';
+import { SeedModule } from './seed/seed.module';
+import { LoggingModule } from './logging/logging.module';
+import { MetricsModule } from './metrics/metrics.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
-      database: 'data/sqlite.db',
-      entities: [Hello, Customer, ContactPoint, Employee, InteractionSummary],
+      database: 'db.sqlite',
+      entities: [join(__dirname, '**/*.entity.{ts,js}')],
       synchronize: true,
+      
     }),
-    GqlModule,
+
+    EmployeeModule,
+    JobModule,
+    UsersModule,
+    ProjectModule,
     AuthModule,
+    GqlAppModule,
+    SeedModule,
+    LoggingModule,
+    MetricsModule
   ],
-  controllers: [AppController],
-  providers: [],
+  providers: [RolesGuard, Reflector],
 })
 export class AppModule {}

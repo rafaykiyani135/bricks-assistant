@@ -1,0 +1,994 @@
+{
+  "elements": [
+    {
+      "name": "AppModule",
+      "type": "module",
+      "file": "src/app.module.ts",
+      "summary": "This is the root module of the application, responsible for orchestrating and integrating all other feature modules. It sets up the core infrastructure, including database connectivity and global guards, ensuring all parts of the application work together seamlessly.",
+      "technicalDetails": [
+        "Providers: RolesGuard, Reflector"
+      ],
+      "dependencies": [
+        "TypeOrmModule",
+        "EmployeeModule",
+        "JobModule",
+        "UsersModule",
+        "ProjectModule",
+        "AuthModule",
+        "GqlAppModule",
+        "SeedModule",
+        "LoggingModule",
+        "MetricsModule"
+      ],
+      "capabilities": [
+        "Bootstrap the application",
+        "Integrate all core business logic and infrastructure modules",
+        "Apply global access control (RolesGuard)",
+        "Configure database connection"
+      ]
+    },
+    {
+      "name": "AuthModule",
+      "type": "module",
+      "file": "src/auth/auth.module.ts",
+      "summary": "This module manages all authentication and authorization processes within the application. It provides services for user login, token generation, and validation, ensuring secure access to application resources.",
+      "technicalDetails": [
+        "Providers: AuthService, AuthResolver, JwtStrategy"
+      ],
+      "dependencies": [
+        "UsersModule",
+        "PassportModule",
+        "JwtModule"
+      ],
+      "capabilities": [
+        "Handle user authentication (login, logout)",
+        "Generate and validate JSON Web Tokens (JWT)",
+        "Integrate with user management",
+        "Provide GraphQL authentication endpoints"
+      ]
+    },
+    {
+      "name": "EmployeeModule",
+      "type": "module",
+      "file": "src/employee/employee.module.ts",
+      "summary": "This module is responsible for managing all operations related to employee data. It provides services for creating, retrieving, updating, and deleting employee records, and exposes these functionalities via GraphQL.",
+      "technicalDetails": [
+        "Providers: EmployeeResolver, EmployeeService, EmployeeLoader"
+      ],
+      "dependencies": [
+        "TypeOrmModule"
+      ],
+      "capabilities": [
+        "Manage employee records (CRUD operations)",
+        "Provide GraphQL API for employee data",
+        "Optimize data fetching for employees (DataLoader)"
+      ]
+    },
+    {
+      "name": "GqlAppModule",
+      "type": "module",
+      "file": "src/graphql/graphql.module.ts",
+      "summary": "This module serves as the central hub for the application's GraphQL API. It aggregates GraphQL resolvers and schemas from various feature modules, providing a unified GraphQL endpoint for clients.",
+      "technicalDetails": [],
+      "dependencies": [
+        "EmployeeModule",
+        "ProjectModule",
+        "GraphQLModule"
+      ],
+      "capabilities": [
+        "Consolidate GraphQL schemas and resolvers",
+        "Expose a single GraphQL API endpoint",
+        "Integrate GraphQL functionality from other modules"
+      ]
+    },
+    {
+      "name": "HelloModule",
+      "type": "module",
+      "file": "src/hello/hello.module.ts",
+      "summary": "This module appears to be a simple, perhaps introductory or example, module that provides basic 'hello' functionality. It likely offers a simple endpoint or query to demonstrate basic application interaction.",
+      "technicalDetails": [
+        "Providers: HelloResolver, HelloService"
+      ],
+      "dependencies": [
+        "TypeOrmModule"
+      ],
+      "capabilities": [
+        "Provide a basic 'hello' endpoint/query",
+        "Demonstrate basic GraphQL resolver and service patterns"
+      ]
+    },
+    {
+      "name": "JobModule",
+      "type": "module",
+      "file": "src/job/job.module.ts",
+      "summary": "This module is dedicated to managing job-related data and operations within the application. It provides services for handling job records and exposes these functionalities through a GraphQL API.",
+      "technicalDetails": [
+        "Providers: JobResolver, JobService"
+      ],
+      "dependencies": [
+        "TypeOrmModule"
+      ],
+      "capabilities": [
+        "Manage job records (CRUD operations)",
+        "Provide GraphQL API for job data"
+      ]
+    },
+    {
+      "name": "LoggingModule",
+      "type": "module",
+      "file": "src/logging/logging.module.ts",
+      "summary": "This module centralizes the application's logging capabilities, providing a consistent way to record events and errors. It also integrates with metrics to provide insights into application performance and behavior.",
+      "technicalDetails": [
+        "Providers: LoggingInterceptor"
+      ],
+      "dependencies": [
+        "MetricsModule",
+        "LoggerModule"
+      ],
+      "capabilities": [
+        "Centralized logging of application events",
+        "Intercept requests and responses for logging",
+        "Integrate with metrics collection"
+      ]
+    },
+    {
+      "name": "MetricsModule",
+      "type": "module",
+      "file": "src/metrics/metrics.module.ts",
+      "summary": "This module is responsible for collecting and exposing application performance and operational metrics. It provides endpoints to monitor the health and performance of the backend system.",
+      "technicalDetails": [
+        "Controllers: MetricsController",
+        "Providers: MetricsService"
+      ],
+      "dependencies": [],
+      "capabilities": [
+        "Collect application performance metrics",
+        "Expose metrics via dedicated HTTP endpoints",
+        "Provide insights into system health and performance"
+      ]
+    },
+    {
+      "name": "ProjectModule",
+      "type": "module",
+      "file": "src/project/project.module.ts",
+      "summary": "This module manages all aspects of project data and related operations within the application. It provides services for handling project records, including complex summaries like quotes, and exposes these functionalities via GraphQL.",
+      "technicalDetails": [
+        "Providers: ProjectResolver, ProjectService, ProjectLoader, QuoteSummaryResolver"
+      ],
+      "dependencies": [
+        "TypeOrmModule"
+      ],
+      "capabilities": [
+        "Manage project records (CRUD operations)",
+        "Provide GraphQL API for project data",
+        "Optimize data fetching for projects (DataLoader)",
+        "Generate and expose project quote summaries"
+      ]
+    },
+    {
+      "name": "SeedModule",
+      "type": "module",
+      "file": "src/seed/seed.module.ts",
+      "summary": "This module is designed for populating the application's database with initial or test data. It orchestrates the seeding process across various core entities like employees, projects, jobs, and users, which is particularly useful for development and testing environments.",
+      "technicalDetails": [
+        "Providers: SeedResolver"
+      ],
+      "dependencies": [
+        "EmployeeModule",
+        "ProjectModule",
+        "JobModule",
+        "UsersModule"
+      ],
+      "capabilities": [
+        "Seed initial data into the database",
+        "Populate multiple entity types (employees, projects, jobs, users)",
+        "Facilitate development and testing environments"
+      ]
+    },
+    {
+      "name": "UsersModule",
+      "type": "module",
+      "file": "src/users/user.module.ts",
+      "summary": "This module is responsible for managing all user-related data and operations. It provides services for user creation, retrieval, and updates, and integrates with employee data, likely to link users to their employee profiles.",
+      "technicalDetails": [
+        "Providers: UserService, UserResolver"
+      ],
+      "dependencies": [
+        "TypeOrmModule",
+        "EmployeeModule"
+      ],
+      "capabilities": [
+        "Manage user accounts (CRUD operations)",
+        "Provide GraphQL API for user data",
+        "Integrate user data with employee profiles"
+      ]
+    },
+    {
+      "name": "AuthResolver",
+      "type": "resolver",
+      "interface": "graphql",
+      "file": "src/auth/auth.resolver.ts",
+      "summary": "This resolver manages user authentication flows, including login and retrieving the current user's profile.",
+      "technicalDetails": [
+        "Mutation login - Authenticates a user and returns an access token. (Public)",
+        "Query me - Retrieves the profile of the currently authenticated user. (Protected by GqlAuthGuard)"
+      ],
+      "dependencies": [
+        "AuthService",
+        "UserService"
+      ],
+      "invokes": [
+        "authService.validateUser",
+        "authService.login",
+        "userService.findById"
+      ],
+      "security": {
+        "authRequired": true,
+        "guards": [
+          "GqlAuthGuard"
+        ]
+      },
+      "capabilities": [
+        "Authenticate users and issue tokens",
+        "Retrieve current user's profile"
+      ]
+    },
+    {
+      "name": "EmployeeResolver",
+      "type": "resolver",
+      "interface": "graphql",
+      "file": "src/employee/employee.resolver.ts",
+      "summary": "This resolver handles CRUD operations and queries for employee entities.",
+      "technicalDetails": [
+        "Query employees - Retrieves a list of all employees. (Protected by GqlAuthGuard)",
+        "Query employee - Retrieves a single employee by ID. (Public)",
+        "Query employeesByIds - Retrieves multiple employees by their IDs. (Public)",
+        "Mutation createEmployee - Creates a new employee record. (Protected by GqlAuthGuard, RolesGuard)",
+        "Mutation updateEmployee - Updates an existing employee record. (Protected by GqlAuthGuard, RolesGuard)",
+        "Mutation deleteEmployee - Deletes an employee record. (Protected by GqlAuthGuard, RolesGuard)"
+      ],
+      "dependencies": [
+        "EmployeeService"
+      ],
+      "invokes": [
+        "service.findAll",
+        "service.findOne",
+        "service.findBy",
+        "service.create",
+        "service.update",
+        "service.delete"
+      ],
+      "security": {
+        "authRequired": true,
+        "guards": [
+          "GqlAuthGuard",
+          "RolesGuard"
+        ]
+      },
+      "capabilities": [
+        "Fetch lists of employees",
+        "Retrieve specific employee details",
+        "Create new employee records",
+        "Update existing employee information",
+        "Delete employee records"
+      ]
+    },
+    {
+      "name": "HelloResolver",
+      "type": "resolver",
+      "interface": "graphql",
+      "file": "src/hello/hello.resolver.ts",
+      "summary": "This resolver provides a basic greeting endpoint for testing API connectivity.",
+      "technicalDetails": [
+        "Query getHello - Returns a simple greeting message. (Public)"
+      ],
+      "dependencies": [
+        "HelloService"
+      ],
+      "invokes": [
+        "helloService.getHello"
+      ],
+      "security": {
+        "authRequired": false,
+        "guards": []
+      },
+      "capabilities": [
+        "Provide a basic health check/greeting"
+      ]
+    },
+    {
+      "name": "JobResolver",
+      "type": "resolver",
+      "interface": "graphql",
+      "file": "src/job/job.resolver.ts",
+      "summary": "This resolver manages job entities, including CRUD operations and resolving related employee and project data.",
+      "technicalDetails": [
+        "Query jobs - Retrieves a list of all jobs. (Public)",
+        "Query job - Retrieves a single job by ID. (Public)",
+        "Mutation createJob - Creates a new job record. (Protected by GqlAuthGuard, RolesGuard)",
+        "Mutation deleteJob - Deletes a job record. (Protected by GqlAuthGuard, RolesGuard)",
+        "Mutation updateJob - Updates an existing job record. (Protected by GqlAuthGuard, RolesGuard)",
+        "ResolveField employee - Resolves the employee associated with a job. (Public)",
+        "ResolveField project - Resolves the project associated with a job. (Public)",
+        "ResolveField estimatedDuration - Resolves the estimated duration for a job. (Public)",
+        "ResolveField estimatedCost - Resolves the estimated cost for a job. (Public)",
+        "ResolveField assignedEmployee - Resolves the assigned employee for a job. (Public)"
+      ],
+      "dependencies": [
+        "JobService"
+      ],
+      "invokes": [
+        "jobService.findAll",
+        "jobService.findById",
+        "jobService.create",
+        "jobService.delete",
+        "jobService.update",
+        "loaders.employeeLoader.load",
+        "loaders.projectLoader.load"
+      ],
+      "security": {
+        "authRequired": true,
+        "guards": [
+          "GqlAuthGuard",
+          "RolesGuard"
+        ]
+      },
+      "capabilities": [
+        "Fetch lists of jobs",
+        "Retrieve specific job details",
+        "Create new job records",
+        "Update existing job information",
+        "Delete job records",
+        "Resolve related employee and project data for jobs",
+        "Calculate estimated duration and cost for jobs"
+      ]
+    },
+    {
+      "name": "MetricsController",
+      "type": "controller",
+      "interface": "rest",
+      "file": "src/metrics/metrics.controller.ts",
+      "summary": "This controller provides application health and performance metrics.",
+      "technicalDetails": [
+        "GET /metrics - Retrieves application health and performance metrics. (Public)"
+      ],
+      "dependencies": [
+        "MetricsService"
+      ],
+      "invokes": [
+        "metrics.snapshot"
+      ],
+      "security": {
+        "authRequired": false,
+        "guards": []
+      },
+      "capabilities": [
+        "Expose application health and performance metrics"
+      ]
+    },
+    {
+      "name": "ProjectResolver",
+      "type": "resolver",
+      "interface": "graphql",
+      "file": "src/project/project.resolver.ts",
+      "summary": "This resolver manages project entities, including CRUD operations and calculating financial summaries.",
+      "technicalDetails": [
+        "Query projects - Retrieves a list of all projects. (Public)",
+        "Query project - Retrieves a single project by ID. (Public)",
+        "Mutation createProject - Creates a new project record. (Protected by GqlAuthGuard, RolesGuard)",
+        "Mutation updateProject - Updates an existing project record. (Protected by GqlAuthGuard, RolesGuard)",
+        "Mutation deleteProject - Deletes a project record. (Protected by GqlAuthGuard, RolesGuard)",
+        "ResolveField totalCost - Resolves the total cost for a project. (Public)",
+        "ResolveField totalPrice - Resolves the total price for a project. (Public)"
+      ],
+      "dependencies": [
+        "ProjectService"
+      ],
+      "invokes": [
+        "projectService.findAll",
+        "projectService.findById",
+        "projectService.create",
+        "projectService.update",
+        "projectService.delete",
+        "loaders.employeeLoader.loadMany"
+      ],
+      "security": {
+        "authRequired": true,
+        "guards": [
+          "GqlAuthGuard",
+          "RolesGuard"
+        ]
+      },
+      "capabilities": [
+        "Fetch lists of projects",
+        "Retrieve specific project details",
+        "Create new project records",
+        "Update existing project information",
+        "Delete project records",
+        "Calculate total cost and price for projects"
+      ]
+    },
+    {
+      "name": "QuoteSummaryResolver",
+      "type": "resolver",
+      "interface": "graphql",
+      "file": "src/project/quote-summary.resolver.ts",
+      "summary": "This resolver provides GraphQL queries for project quote summaries.",
+      "technicalDetails": [
+        "Query quoteSummary - Retrieves a summary quote for a specific project. (Public)",
+        "Query allProjectSummaries - Retrieves summaries for all projects. (Public)"
+      ],
+      "dependencies": [
+        "ProjectService"
+      ],
+      "invokes": [
+        "projectService.getQuoteSummary",
+        "projectService.getAllProjectSummaries"
+      ],
+      "security": {
+        "authRequired": false,
+        "guards": []
+      },
+      "capabilities": [
+        "Generate project quote summaries",
+        "Retrieve summaries for all projects"
+      ]
+    },
+    {
+      "name": "SeedResolver",
+      "type": "resolver",
+      "interface": "graphql",
+      "file": "src/seed/seed.resolver.ts",
+      "summary": "This resolver provides a mutation to populate the database with initial seed data.",
+      "technicalDetails": [
+        "Mutation seed - Populates the database with sample data for employees, users, projects, and jobs. (Public)"
+      ],
+      "dependencies": [
+        "EmployeeService",
+        "ProjectService",
+        "JobService",
+        "UserService"
+      ],
+      "invokes": [
+        "employeeService.create",
+        "userService.create",
+        "projectService.create",
+        "jobService.create"
+      ],
+      "security": {
+        "authRequired": false,
+        "guards": []
+      },
+      "capabilities": [
+        "Populate the database with initial seed data"
+      ]
+    },
+    {
+      "name": "UserResolver",
+      "type": "resolver",
+      "interface": "graphql",
+      "file": "src/users/user.resolver.ts",
+      "summary": "This resolver handles user creation operations.",
+      "technicalDetails": [
+        "Mutation createUser - Creates a new user account. (Public)"
+      ],
+      "dependencies": [
+        "UserService"
+      ],
+      "invokes": [
+        "userService.create"
+      ],
+      "security": {
+        "authRequired": false,
+        "guards": []
+      },
+      "capabilities": [
+        "Register new user accounts"
+      ]
+    },
+    {
+      "name": "AuthService",
+      "type": "service",
+      "file": "src/auth/auth.service.ts",
+      "summary": "This service is responsible for handling user authentication processes, including validating user credentials and generating authentication tokens.",
+      "technicalDetails": [
+        "validateUser - Authenticates a user by verifying their email and password against stored credentials. (Async)",
+        "login - Generates a JSON Web Token (JWT) for a successfully authenticated user, enabling subsequent authorized requests."
+      ],
+      "dependencies": [
+        "UserService",
+        "JwtService"
+      ],
+      "invokes": [
+        "userService.findByEmail",
+        "jwtService.sign"
+      ],
+      "capabilities": [
+        "User credential validation",
+        "JWT token generation for authenticated users"
+      ]
+    },
+    {
+      "name": "GqlAuthGuard",
+      "type": "guard",
+      "file": "src/auth/guard/gql-auth.guard.ts",
+      "summary": "This guard is specifically designed for GraphQL contexts to extract the underlying HTTP request, which is necessary for authentication strategies to operate correctly.",
+      "technicalDetails": [
+        "getRequest - Extracts the raw HTTP request object from the GraphQL execution context."
+      ],
+      "dependencies": [],
+      "invokes": [
+        "GqlExecutionContext.create",
+        "ctx.getContext"
+      ],
+      "capabilities": [
+        "GraphQL context adaptation for authentication"
+      ]
+    },
+    {
+      "name": "RolesGuard",
+      "type": "guard",
+      "file": "src/auth/guard/roles.guard.ts",
+      "summary": "This guard implements role-based access control (RBAC) for GraphQL resolvers, ensuring that only users with specific roles can access protected resources.",
+      "technicalDetails": [
+        "canActivate - Determines if the current user has the necessary roles to access the requested resource by comparing user roles with required roles defined on the resolver or class."
+      ],
+      "dependencies": [
+        "Reflector"
+      ],
+      "invokes": [
+        "reflector.getAllAndOverride",
+        "context.getHandler",
+        "context.getClass",
+        "GqlExecutionContext.create",
+        "ctx.getContext",
+        "requiredRoles.some",
+        "userRoles.includes"
+      ],
+      "capabilities": [
+        "Role-based access control (RBAC)",
+        "Authorization for GraphQL endpoints"
+      ]
+    },
+    {
+      "name": "JwtStrategy",
+      "type": "strategy",
+      "file": "src/auth/strategies/jwt.strategy.ts",
+      "summary": "This authentication strategy validates JSON Web Tokens (JWTs) extracted from incoming requests, typically used to identify and authenticate users after login.",
+      "technicalDetails": [
+        "validate - Processes the JWT payload, extracts user information, and validates the user's existence. (Async)"
+      ],
+      "dependencies": [
+        "UserService"
+      ],
+      "invokes": [],
+      "capabilities": [
+        "JWT token validation",
+        "User identification from JWT payload"
+      ]
+    },
+    {
+      "name": "OidcStrategy",
+      "type": "strategy",
+      "file": "src/auth/strategies/oidc.strategy.ts",
+      "summary": "This authentication strategy implements OpenID Connect (OIDC) validation, allowing the application to authenticate users via an OIDC provider.",
+      "technicalDetails": [
+        "validate - Validates the OIDC issuer, subject, and profile information provided by the OIDC provider. (Async)"
+      ],
+      "dependencies": [],
+      "invokes": [],
+      "capabilities": [
+        "OpenID Connect (OIDC) authentication",
+        "External identity provider integration"
+      ]
+    },
+    {
+      "name": "LoggingInterceptor",
+      "type": "interceptor",
+      "file": "src/common/interceptors/logging.interceptor.ts",
+      "summary": "This interceptor provides comprehensive logging for incoming requests and outgoing responses, particularly for GraphQL operations, including execution time and error reporting.",
+      "technicalDetails": [
+        "intercept - Logs details about the request, measures the execution time of the handler, records resolver metrics, and logs the outcome (success or error) of the operation."
+      ],
+      "dependencies": [
+        "PinoLogger",
+        "MetricsService"
+      ],
+      "invokes": [
+        "Date.now",
+        "context.getType",
+        "GqlExecutionContext.create",
+        "gqlCtx.getInfo",
+        "pipe",
+        "next.handle",
+        "metrics.recordResolver",
+        "logger.info",
+        "logger.error"
+      ],
+      "capabilities": [
+        "Request/response logging",
+        "Performance monitoring for GraphQL resolvers",
+        "Error logging"
+      ]
+    },
+    {
+      "name": "EmployeeLoader",
+      "type": "loader",
+      "file": "src/employee/employee.loader.ts",
+      "summary": "This data loader is designed to efficiently fetch employee data, typically used in GraphQL to batch requests and prevent N+1 query problems when resolving employee relationships.",
+      "technicalDetails": [],
+      "dependencies": [
+        "EmployeeService"
+      ],
+      "invokes": [],
+      "capabilities": [
+        "Batch loading of employee data",
+        "N+1 query problem mitigation"
+      ]
+    },
+    {
+      "name": "EmployeeService",
+      "type": "service",
+      "file": "src/employee/employee.service.ts",
+      "summary": "This service manages all business operations related to 'Employees', including their creation, retrieval, updates, and deletion.",
+      "technicalDetails": [
+        "findAll - Retrieves a list of all employees.",
+        "findOne - Retrieves a single employee by their unique ID. (Async)",
+        "findBy - Retrieves multiple employees based on a list of IDs. (Async)",
+        "create - Creates a new employee record in the system. (Async)",
+        "update - Modifies an existing employee's details. (Async)",
+        "delete - Removes an employee record from the system. (Async)"
+      ],
+      "dependencies": [
+        "Repository<Employee>"
+      ],
+      "invokes": [
+        "employeeRepo.find",
+        "employeeRepo.findOne",
+        "employeeRepo.findBy",
+        "employeeRepo.create",
+        "employeeRepo.save",
+        "findOne",
+        "employeeRepo.delete"
+      ],
+      "capabilities": [
+        "Employee lifecycle management (CRUD)",
+        "Batch retrieval of employees"
+      ]
+    },
+    {
+      "name": "HelloService",
+      "type": "service",
+      "file": "src/hello/hello.service.ts",
+      "summary": "This service provides a basic 'hello' functionality, potentially retrieving a greeting message from a data source.",
+      "technicalDetails": [
+        "getHello - Retrieves a greeting message, possibly personalized or from a stored configuration. (Async)"
+      ],
+      "dependencies": [
+        "Repository<Hello>"
+      ],
+      "invokes": [
+        "repo.findOneBy"
+      ],
+      "capabilities": [
+        "Basic greeting retrieval"
+      ]
+    },
+    {
+      "name": "JobService",
+      "type": "service",
+      "file": "src/job/job.service.ts",
+      "summary": "This service manages the lifecycle of 'Jobs' within projects, handling their creation, retrieval, updates, and deletion, and ensuring project costs are recalculated accordingly.",
+      "technicalDetails": [
+        "findAll - Retrieves a list of all jobs. (Async)",
+        "findById - Retrieves a single job by its unique ID. (Async)",
+        "create - Creates a new job, associating it with a project and potentially an employee, then triggers a project recalculation. (Async)",
+        "delete - Removes a job from the system and triggers a project recalculation to update costs. (Async)",
+        "update - Modifies an existing job's details, such as title, category, complexity, price, or assigned employee, and triggers a project recalculation. (Async)"
+      ],
+      "dependencies": [
+        "Repository<Job>",
+        "EmployeeService",
+        "ProjectService"
+      ],
+      "invokes": [
+        "jobRepo.find",
+        "jobRepo.findOne",
+        "projectService.findById",
+        "employeeService.findOne",
+        "jobRepo.save",
+        "projectService.recalculate",
+        "jobRepo.remove"
+      ],
+      "capabilities": [
+        "Job lifecycle management (CRUD)",
+        "Assignment of employees to jobs",
+        "Integration with project cost recalculation"
+      ]
+    },
+    {
+      "name": "MetricsService",
+      "type": "service",
+      "file": "src/metrics/metrics.service.ts",
+      "summary": "This service is responsible for collecting and providing snapshots of application performance metrics, particularly focusing on GraphQL resolver execution times.",
+      "technicalDetails": [
+        "recordResolver - Records the execution time for a specific GraphQL resolver field.",
+        "snapshot - Provides a current snapshot of collected resolver performance metrics."
+      ],
+      "dependencies": [],
+      "invokes": [
+        "resolverStats.get",
+        "resolverStats.set",
+        "resolverStats.entries",
+        "toFixed"
+      ],
+      "capabilities": [
+        "Application performance monitoring",
+        "GraphQL resolver timing and reporting"
+      ]
+    },
+    {
+      "name": "ProjectLoader",
+      "type": "loader",
+      "file": "src/project/project.loader.ts",
+      "summary": "This data loader is designed to efficiently fetch project data, typically used in GraphQL to batch requests and prevent N+1 query problems when resolving project relationships.",
+      "technicalDetails": [],
+      "dependencies": [
+        "ProjectService"
+      ],
+      "invokes": [],
+      "capabilities": [
+        "Batch loading of project data",
+        "N+1 query problem mitigation"
+      ]
+    },
+    {
+      "name": "ProjectService",
+      "type": "service",
+      "file": "src/project/project.service.ts",
+      "summary": "This service manages all business operations related to 'Projects', including their creation, retrieval, updates, deletion, and complex calculations like total costs and quote summaries.",
+      "technicalDetails": [
+        "findAll - Retrieves a list of all projects. (Async)",
+        "findById - Retrieves a single project by its unique ID, including its associated jobs. (Async)",
+        "findByIds - Retrieves multiple projects based on a list of IDs. (Async)",
+        "create - Creates a new project record in the system. (Async)",
+        "update - Modifies an existing project's details. (Async)",
+        "recalculate - Recalculates the total estimated cost of a project based on its associated jobs. (Async)",
+        "delete - Removes a project record from the system. (Async)",
+        "getQuoteSummary - Generates a summary of estimated costs for a specific project. (Async)",
+        "getAllProjectSummaries - Retrieves summaries of estimated costs for all projects. (Async)"
+      ],
+      "dependencies": [
+        "Repository<ProjectEntity>"
+      ],
+      "invokes": [
+        "projectRepo.find",
+        "getOne",
+        "where",
+        "leftJoinAndSelect",
+        "projectRepo.createQueryBuilder",
+        "projectRepo.findBy",
+        "projectRepo.save",
+        "jobs.reduce",
+        "projectRepo.findOne",
+        "projectRepo.remove",
+        "projects.map"
+      ],
+      "capabilities": [
+        "Project lifecycle management (CRUD)",
+        "Project cost calculation and aggregation",
+        "Project quote generation",
+        "Batch retrieval of projects"
+      ]
+    },
+    {
+      "name": "UserService",
+      "type": "service",
+      "file": "src/users/user.service.ts",
+      "summary": "This service manages all business operations related to 'Users', including their creation, retrieval, and association with employees.",
+      "technicalDetails": [
+        "findAll - Retrieves a list of all users.",
+        "create - Creates a new user account, optionally linking it to an existing employee. (Async)",
+        "findById - Retrieves a single user by their unique ID.",
+        "findByEmail - Retrieves a single user by their email address."
+      ],
+      "dependencies": [
+        "Repository<User>",
+        "EmployeeService"
+      ],
+      "invokes": [
+        "repo.find",
+        "employeeService.findOne",
+        "repo.findOne",
+        "repo.create",
+        "repo.save",
+        "repo.findOneBy"
+      ],
+      "capabilities": [
+        "User lifecycle management (CRUD)",
+        "User lookup by ID and email",
+        "Association of users with employees"
+      ]
+    },
+    {
+      "name": "CreateEmployeeInput",
+      "type": "dto",
+      "file": "src/employee/dto/create-employee.input.ts",
+      "summary": "Represents the data required to create a new employee.",
+      "technicalDetails": [
+        "name (string, required): The name of the employee.",
+        "hourlyCost (number, required): The hourly cost associated with the employee.",
+        "productivity (number, required): The productivity level of the employee.",
+        "role (string, required): The role or position of the employee."
+      ],
+      "dependencies": [],
+      "capabilities": [
+        "Data structure for creating a new employee",
+        "Define schema for employee creation"
+      ]
+    },
+    {
+      "name": "UpdateEmployeeInput",
+      "type": "dto",
+      "file": "src/employee/dto/update-employee.input.ts",
+      "summary": "Represents the data required to update an existing employee.",
+      "technicalDetails": [
+        "id (number, required): The unique identifier of the employee to update."
+      ],
+      "dependencies": [],
+      "capabilities": [
+        "Data structure for updating an existing employee",
+        "Define schema for employee updates"
+      ]
+    },
+    {
+      "name": "HelloQuery",
+      "type": "dto",
+      "file": "src/hello/hello.model.ts",
+      "summary": "Represents the response data for a simple hello query.",
+      "technicalDetails": [
+        "message (string, required): A greeting message."
+      ],
+      "dependencies": [],
+      "capabilities": [
+        "Data structure for a hello query response",
+        "Define schema for a greeting message"
+      ]
+    },
+    {
+      "name": "CreateJobInput",
+      "type": "dto",
+      "file": "src/job/job.input.ts",
+      "summary": "Represents the data required to create a new job.",
+      "technicalDetails": [
+        "title (string, required): The title or name of the job.",
+        "category (JobCategory, required): The category to which the job belongs.",
+        "estimatedComplexity (number, required): The estimated complexity level of the job.",
+        "price (number, required): The price or cost associated with the job.",
+        "assignedEmployeeId (number, optional): The unique identifier of the employee assigned to this job.",
+        "projectId (number, required): The unique identifier of the project this job is part of."
+      ],
+      "dependencies": [
+        "JobCategory"
+      ],
+      "capabilities": [
+        "Data structure for creating a new job",
+        "Define schema for job creation"
+      ]
+    },
+    {
+      "name": "UpdateJobInput",
+      "type": "dto",
+      "file": "src/job/job.input.ts",
+      "summary": "Represents the data required to update an existing job.",
+      "technicalDetails": [
+        "title (string, optional): The new title or name of the job.",
+        "category (JobCategory, optional): The new category to which the job belongs.",
+        "estimatedComplexity (number, optional): The new estimated complexity level of the job.",
+        "price (number, optional): The new price or cost associated with the job.",
+        "assignedEmployeeId (number, optional): The new unique identifier of the employee assigned to this job."
+      ],
+      "dependencies": [
+        "JobCategory"
+      ],
+      "capabilities": [
+        "Data structure for updating an existing job",
+        "Define schema for job updates"
+      ]
+    },
+    {
+      "name": "CreateProjectInput",
+      "type": "dto",
+      "file": "src/project/project.input.ts",
+      "summary": "Represents the data required to create a new project.",
+      "technicalDetails": [
+        "name (string, required): The name of the project.",
+        "client (string, required): The client associated with the project.",
+        "startDate (string, required): The start date of the project.",
+        "estimatedEndDate (string, required): The estimated end date of the project."
+      ],
+      "dependencies": [],
+      "capabilities": [
+        "Data structure for creating a new project",
+        "Define schema for project creation"
+      ]
+    },
+    {
+      "name": "UpdateProjectInput",
+      "type": "dto",
+      "file": "src/project/project.input.ts",
+      "summary": "Represents the data required to update an existing project.",
+      "technicalDetails": [
+        "name (string, optional): The new name of the project.",
+        "client (string, optional): The new client associated with the project.",
+        "startDate (string, optional): The new start date of the project.",
+        "estimatedEndDate (string, optional): The new estimated end date of the project."
+      ],
+      "dependencies": [],
+      "capabilities": [
+        "Data structure for updating an existing project",
+        "Define schema for project updates"
+      ]
+    },
+    {
+      "name": "CreateUserInput",
+      "type": "dto",
+      "file": "src/users/dto/create-user-input.ts",
+      "summary": "Represents the data required to create a new user.",
+      "technicalDetails": [
+        "username (string, required): The unique username for the new user.",
+        "email (string, required): The email address of the new user.",
+        "password (string, required): The password for the new user account.",
+        "employeeId (number, required): The unique identifier of the employee associated with this user account."
+      ],
+      "dependencies": [],
+      "capabilities": [
+        "Data structure for creating a new user",
+        "Define schema for user creation"
+      ]
+    },
+    {
+      "name": "SystemArchitecture",
+      "type": "architecture",
+      "file": "N/A",
+      "summary": "The system is structured around a modular architecture, with distinct functional domains like Authentication, User Management, Employee, Project, and Job management. User interactions are primarily handled by GraphQL resolvers (or controllers for REST, though mostly resolvers are listed) which delegate to dedicated services. Cross-cutting concerns like logging and metrics are handled by dedicated modules. A 'Seed' module exists for system initialization, demonstrating broad dependencies across core data services. The core data services (User, Employee, Project) are central, with several other services and modules depending on them.",
+      "technicalDetails": [
+        "**High-Level Flows (Controller/Resolver to Service):**",
+        "- User-facing resolvers (AuthResolver, EmployeeResolver, JobResolver, ProjectResolver, UserResolver, HelloResolver) directly depend on their respective core services (AuthService, EmployeeService, JobService, ProjectService, UserService, HelloService).",
+        "- AuthResolver also depends on UserService for user-related authentication tasks.",
+        "- QuoteSummaryResolver specifically depends on ProjectService for project summary data.",
+        "- MetricsController depends on MetricsService for operational data exposure.",
+        "- SeedResolver exhibits broad dependencies, interacting with EmployeeService, ProjectService, JobService, and UserService, indicating its role in data initialization or setup.",
+        "",
+        "**Inter-Service Dependencies:**",
+        "- AuthService relies on UserService for user authentication and authorization logic.",
+        "- JwtStrategy (part of the authentication mechanism) also depends on UserService to validate user tokens and retrieve user details.",
+        "- JobService depends on both EmployeeService and ProjectService, indicating that job entities are linked to employees and projects.",
+        "- UserService depends on EmployeeService, suggesting a potential link between system users and employee records.",
+        "- Data loaders (EmployeeLoader, ProjectLoader) depend on their respective services (EmployeeService, ProjectService) to fetch data efficiently, likely for GraphQL N+1 problem mitigation.",
+        "- LoggingInterceptor, a cross-cutting concern, depends on MetricsService to report operational metrics and potentially feed into monitoring systems.",
+        "",
+        "**Module Boundaries:**",
+        "- **AuthModule**: Encapsulates authentication logic, including AuthService, AuthResolver, and JwtStrategy.",
+        "- **UsersModule**: Manages user data and operations, containing UserService and UserResolver.",
+        "- **EmployeeModule**: Handles employee-related operations, comprising EmployeeService, EmployeeResolver, and EmployeeLoader.",
+        "- **ProjectModule**: Manages project data, including ProjectService, ProjectResolver, ProjectLoader, and QuoteSummaryResolver.",
+        "- **JobModule**: Manages job-related operations, containing JobService and JobResolver.",
+        "- **MetricsModule**: Provides metrics collection and reporting capabilities, with MetricsService and MetricsController.",
+        "- **LoggingModule**: Implements cross-cutting logging functionality via LoggingInterceptor.",
+        "- **SeedModule**: Contains initialization logic through SeedResolver, designed for data seeding or setup.",
+        "- **HelloModule**: A simple, isolated module for basic functionality, with HelloService and HelloResolver.",
+        "- **AppModule**: Appears to be the root module, providing global guards (RolesGuard, Reflector) for authorization.",
+        "- **GqlAppModule**: Present, likely for GraphQL setup, but without specific providers/controllers listed in the provided data.",
+        "",
+        "**Critical Dependencies & Central Components:**",
+        "- **UserService**: Highly critical, serving as a central identity management component. It is depended upon by AuthService, JwtStrategy, SeedResolver, and indirectly by other modules requiring user context.",
+        "- **EmployeeService & ProjectService**: These are core business entity services, central to the system. They are depended upon by JobService, UserService (for EmployeeService), and SeedResolver, indicating their foundational role.",
+        "- **MetricsService**: A key dependency for LoggingInterceptor, highlighting its role as a central hub for system observability data and operational insights.",
+        "- **SeedResolver**: Critical for system initialization and data population due to its wide array of dependencies on core data services (EmployeeService, ProjectService, JobService, UserService).",
+        "- **AuthModule & UsersModule**: Together, these modules form a foundational security and identity layer for the entire application, controlling access and managing user information."
+      ],
+      "dependencies": []
+    }
+  ]
+}

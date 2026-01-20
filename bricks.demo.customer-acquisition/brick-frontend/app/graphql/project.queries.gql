@@ -1,0 +1,111 @@
+# Projects list
+query Projects {
+  projects { # lista de proyectos
+    id
+    name
+    client
+    startDate
+    estimatedEndDate
+    totalCost
+    expectedRevenue
+    netMargin
+  }
+}
+
+# All project summaries for dashboard
+query AllProjectSummaries {
+  allProjectSummaries {
+    project {
+      id
+      name
+      client
+      startDate
+      estimatedEndDate
+    }
+    jobs {
+      id
+      title
+      price
+      estimatedComplexity
+      assignedEmployee {
+        id
+        name
+      }
+    }
+    totalCost
+    expectedRevenue
+    netMargin
+  }
+}
+
+# Single project with jobs
+query Project($id: Int!) {
+  project(id: $id) {
+    id
+    name
+    client
+    startDate
+    estimatedEndDate
+    totalCost
+    expectedRevenue
+    netMargin
+    jobs {
+      id
+      title
+      price
+      estimatedComplexity
+      assignedEmployee { id name }
+    }
+  }
+}
+
+# Update job
+mutation UpdateJob($id: Int!, $input: UpdateJobInput!) {
+  updateJob(id: $id, input: $input) {
+    id
+    title
+    price
+    estimatedComplexity
+    assignedEmployee { id name }
+  }
+}
+
+# Create project
+mutation CreateProject($input: CreateProjectInput!) {
+  createProject(input: $input) {
+    id
+    name
+    client
+    startDate
+    estimatedEndDate
+    totalCost
+    expectedRevenue
+    netMargin
+  }
+}
+
+# Update project
+mutation UpdateProject($id: Int!, $name: String, $client: String, $startDate: String, $estimatedEndDate: String) {
+  updateProject(id: $id, name: $name, client: $client, startDate: $startDate, estimatedEndDate: $estimatedEndDate) {
+    id
+    name
+    client
+    startDate
+    estimatedEndDate
+    totalCost
+    expectedRevenue
+    netMargin
+  }
+}
+
+# Login mutation
+mutation Login($email: String!, $password: String!) {
+  login(email: $email, password: $password) {
+    token
+    employee {
+      id
+      firstName
+      lastName
+    }
+  }
+}

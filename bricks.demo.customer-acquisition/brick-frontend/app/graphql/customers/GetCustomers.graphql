@@ -1,8 +1,0 @@
-query GetCustomers {
-  customers {
-    id
-    name
-    website
-    industry
-  }
-}

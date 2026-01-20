@@ -1,84 +1,94 @@
-<script setup lang="ts">
-  import { computed } from 'vue';
-  import { useAuthStore } from '~/stores/auth';
-  import { useRoute } from 'vue-router';
-  import type { NavigationMenuItem } from '@nuxt/ui';
-  import ThemeSelector from './ThemeSelector.vue';
-
-  const auth = useAuthStore();
-  const route = useRoute();
-
-  // Generate avatar URL using DiceBear API
-  const avatarUrl = computed(() => {
-    if (!auth.user) return '';
-    // Use email as seed for consistent avatar generation
-    const seed = auth.user.email || auth.user.name || 'default';
-    // Acceptable: 'identicon','avataaars', 'bottts', 'personas', etc.
-    return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
-  });
-
-  const items = computed<NavigationMenuItem[]>(() => [
-    {
-      label: 'Dashboard',
-      to: '/dashboard',
-      active: route.path.startsWith('/dashboard'),
-    },
-    {
-      label: 'Customers',
-      to: '/customers',
-      active: route.path.startsWith('/customers'),
-    },
-  ]);
-
-  const dropdownItems = computed(() => {
-    if (!auth.user) return [];
-    return [
-      {
-        label: auth.user.name,
-        description: auth.user.email,
-        disabled: true,
-      },
-      {
-        type: 'separator' as const,
-      },
-      {
-        label: 'Log out',
-        icon: 'i-lucide-log-out',
-        onSelect: () => auth.logout(),
-      },
-    ];
-  });
-</script>
+<style>
+    :root {
+        --ui-border: var(--ui-color-primary-500);
+    }
+</style>
 
 <template>
-  <UHeader>
-    <template #title>
-      <span class="text-primary">Brickcode</span>
-    </template>
-    <UNavigationMenu v-if="auth.user" :items="items" />
-    <template #right>
-      <ThemeSelector />
-      <UDropdownMenu
-        v-if="auth.user"
-        :items="dropdownItems"
-        :content="{
-          align: 'end',
-          sideOffset: 8,
-        }"
-      >
-        <button
-          class="ring-primary/20 flex size-9 items-center justify-center overflow-hidden rounded-full ring-2 transition hover:opacity-90"
-          type="button"
-          aria-label="Open user menu"
-        >
-          <img
-            v-if="avatarUrl"
-            :src="avatarUrl"
-            :alt="auth.user.name || 'User avatar'"
-            class="size-full object-cover"
-          />
-        </button>
-      </UDropdownMenu>
-    </template>
-  </UHeader>
+    <UHeader title="Brickcode">
+        <template #right>
+            <nav class="flex items-center gap-2 sm:gap-4">
+                <NuxtLink 
+                    to="/dashboard" 
+                    class="px-2 py-1 sm:px-0 sm:py-0 typography-caption font-medium text-gray-700 hover:text-brick-orange dark:text-brick-offwhite/80 dark:hover:text-brick-orange transition-colors rounded sm:rounded-none hover:bg-gray-100 dark:hover:bg-brick-orange/10 sm:hover:bg-transparent"
+                >
+                    Dashboard
+                </NuxtLink>
+                <NuxtLink
+                    to="/projects"
+                    class="px-2 py-1 sm:px-0 sm:py-0 typography-caption font-medium text-gray-700 hover:text-brick-orange dark:text-brick-offwhite/80 dark:hover:text-brick-orange transition-colors rounded sm:rounded-none hover:bg-gray-100 dark:hover:bg-brick-orange/10 sm:hover:bg-transparent"
+                >
+                    Projects
+                </NuxtLink>
+                <!-- Toggle de tema -->
+                <ThemeToggle />
+                
+                <!-- Información del usuario -->
+                <ClientOnly>
+                    <div v-if="!userLoading && currentUser" class="hidden sm:flex items-center gap-3 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-md">
+                        <div class="flex flex-col text-right">
+                            <span class="text-xs font-medium text-gray-800 dark:text-gray-200">
+                                {{ getUserDisplayName() }}
+                            </span>
+                            <span class="text-xs text-gray-600 dark:text-gray-400">
+                                {{ getUserRole() }}
+                            </span>
+                        </div>
+                        <div class="w-8 h-8 bg-brick-orange rounded-full flex items-center justify-center">
+                            <span class="text-xs font-bold text-white">
+                                {{ getUserDisplayName().charAt(0).toUpperCase() }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Versión móvil - solo iniciales -->
+                    <div v-if="!userLoading && currentUser" class="sm:hidden flex items-center">
+                        <div class="w-7 h-7 bg-brick-orange rounded-full flex items-center justify-center">
+                            <span class="text-xs font-bold text-white">
+                                {{ getUserDisplayName().charAt(0).toUpperCase() }}
+                            </span>
+                        </div>
+                    </div>
+                </ClientOnly>
+                
+                <!-- Sign Out Button -->
+                <button
+                    @click="handleLogout"
+                    class="px-2 py-1 sm:px-3 sm:py-1.5 typography-caption font-medium text-brick-offwhite bg-brick-red hover:bg-brick-red-400 dark:bg-brick-red dark:hover:bg-brick-red-400 transition-colors rounded-md flex items-center gap-1 sm:gap-2"
+                    title="Logout"
+                >
+                    <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span class="hidden sm:inline">Logout</span>
+                </button>
+            </nav>
+        </template>
+    </UHeader>
 </template>
+
+<script setup lang="ts">
+import { useAuth } from '~/composables/useAuth';
+
+const { logout, currentUser, userLoading } = useAuth();
+
+const handleLogout = () => {
+    logout();
+};
+
+const getUserDisplayName = () => {
+    if (!currentUser.value) return '';
+    return currentUser.value.employee?.name || currentUser.value.username || currentUser.value.email;
+};
+
+const getUserRole = () => {
+    if (!currentUser.value?.employee?.role) return '';
+    const role = currentUser.value.employee.role;
+    const roleMap: Record<string, string> = {
+        'ADMIN': 'Administrator',
+        'MANAGER': 'Manager',
+        'EMPLOYEE': 'Employee'
+    };
+    return roleMap[role] || role;
+};
+</script>

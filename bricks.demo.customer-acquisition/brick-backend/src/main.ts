@@ -1,38 +1,29 @@
-import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { AppModule } from './app.module';
+import { GqlExceptionFilter } from './common/filters/gql-exception.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.enableCors({
-    origin: 'http://localhost:3000',
-    credentials: true,
-  });
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  app.useLogger(app.get(Logger));
+  app.useGlobalFilters(new GqlExceptionFilter());
   app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
-      exceptionFactory: (validationErrors = []) => {
-        const formattedErrors = {};
-
-        for (const error of validationErrors) {
-          if (!error.constraints) continue;
-
-          formattedErrors[error.property] = Object.values(error.constraints);
-        }
-
-        return new BadRequestException({
-          message: 'Validation error',
-          statusCode: 400,
-          errors: formattedErrors,
-        });
-      },
-    }),
-  );
-  await app.listen(process.env.PORT ?? 3001);
+  new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: false,
+    transform: true,
+  }),
+);
+  app.useGlobalInterceptors(app.get(LoggingInterceptor));
+  // Habilitar CORS para permitir llamadas desde el frontend (puerto 3001)
+  app.enableCors({
+    origin: ['http://localhost:3000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  });
+  await app.listen(process.env.PORT ?? 3004);
 }
-void bootstrap();
+bootstrap();

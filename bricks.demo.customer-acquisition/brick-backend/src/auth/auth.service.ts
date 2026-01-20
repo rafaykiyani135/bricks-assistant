@@ -1,70 +1,35 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import * as jwt from 'jsonwebtoken';
-import { EmployeesService } from 'src/employees/employees.service';
-
-const ACCESS_TOKEN_SECRET = 'JWT_ACCESS_SECRET';
-const REFRESH_TOKEN_SECRET = 'JWT_REFRESH_SECRET';
-
-export type GoogleUser = {
-  email: string;
-  name: string;
-  googleId: string;
-  avatar: string;
-};
+import { JwtService } from '@nestjs/jwt';
+import { UserService } from '../users/user.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private employees: EmployeesService) {}
+  constructor(
+    private userService: UserService,
+    private jwtService: JwtService,
+  ) {}
 
-  async handleGoogleLogin(googleUser: GoogleUser) {
-    let user = await this.employees.findByEmail(googleUser.email);
-
-    if (!user) {
-      user = await this.employees.create({
-        email: googleUser.email,
-        name: googleUser.name,
-      });
+  // Login simple
+  async validateUser(email: string, password: string) {
+    const user = await this.userService.findByEmail(email);
+    if (!user || user.password !== password) {
+      throw new UnauthorizedException('Invalid credentials');
     }
-
-    const accessToken = jwt.sign({ sub: user.id }, ACCESS_TOKEN_SECRET, {
-      expiresIn: '7d',
-    });
-    const refreshToken = jwt.sign({ sub: user.id }, REFRESH_TOKEN_SECRET, {
-      expiresIn: '7d',
-    });
-
-    return { user, accessToken, refreshToken };
+    return user;
   }
 
-  refreshAccessToken(refreshToken: string) {
-    try {
-      const payload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
-      const accessToken = jwt.sign({ sub: payload.sub }, ACCESS_TOKEN_SECRET, {
-        expiresIn: '7d',
-      });
-      return accessToken;
-    } catch {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
-  }
-
-  async getAuthState(accessToken: string) {
-    try {
-      const payload = jwt.verify(accessToken, ACCESS_TOKEN_SECRET);
-      const userId = typeof payload?.sub === 'string' ? payload.sub : undefined;
-
-      if (!userId) {
-        throw new UnauthorizedException('Invalid access token');
-      }
-
-      const user = await this.employees.findOne(userId);
-      if (!user) {
-        throw new UnauthorizedException('User not found');
-      }
-
-      return user;
-    } catch {
-      throw new UnauthorizedException('Invalid access token');
-    }
+  login(user: any) {
+    // El role está en user.employee.role (relación eager). Propagamos como employeeRole y roles array.
+    const employeeRole = user?.employee?.role;
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      employeeId: user.employeeId,
+      employeeRole,
+      roles: employeeRole ? [employeeRole] : [],
+    };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
   }
 }

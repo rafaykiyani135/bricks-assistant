@@ -1,12 +1,22 @@
 import { Module } from '@nestjs/common';
-import { EmployeesModule } from 'src/employees/employees.module';
-import { AuthController } from './auth.controller';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+
 import { AuthService } from './auth.service';
-import { GoogleStrategy } from './google.strategy';
+import { AuthResolver } from './auth.resolver';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { UsersModule } from '../users/user.module';
 
 @Module({
-  imports: [EmployeesModule],
-  providers: [AuthService, GoogleStrategy],
-  controllers: [AuthController],
+  imports: [
+    UsersModule,
+    PassportModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET || 'fallback-secret',
+      signOptions: { expiresIn: '1d' },
+    }),
+  ],
+  providers: [AuthService, AuthResolver, JwtStrategy],
+  exports: [AuthService],
 })
 export class AuthModule {}

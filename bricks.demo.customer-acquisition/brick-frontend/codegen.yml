@@ -1,0 +1,14 @@
+schema: http://localhost:3004/graphql
+documents: 'app/graphql/**/*.gql'
+generates:
+  app/graphql/types.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-vue-apollo
+    config:
+      withCompositionFunctions: true
+      vueCompositionApiImportFrom: vue
+hooks:
+  afterAllFileWrite:
+    - npx prettier --write app/graphql/types.ts

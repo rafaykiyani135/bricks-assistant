@@ -1,9 +1,0 @@
-mutation UpdateContactPoint($input: UpdateContactPointInput!) {
-  updateContactPoint(input: $input) {
-    id
-    name
-    role
-    email
-    phone
-  }
-}

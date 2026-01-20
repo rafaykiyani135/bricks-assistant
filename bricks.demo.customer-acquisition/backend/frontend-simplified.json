@@ -1,0 +1,445 @@
+{
+  "elements": [
+    {
+      "name": "login",
+      "type": "page",
+      "route": "/auth/login",
+      "file": "app/pages/auth/login.vue",
+      "summaryDescriptionInLaymansTerms": "This page allows you to securely log into the application using your Google account.",
+      "detailedUserActions": [
+        "Click the \"Sign in with Google\" button to start the OAuth authentication process."
+      ],
+      "visibleElements": [
+        "\"Sign in with Google\" button (UButton)"
+      ],
+      "conditionalStates": [],
+      "technicalImplementation": {
+        "components": [
+          "UButton"
+        ],
+        "functions": [
+          "login"
+        ],
+        "composables": [],
+        "formFields": [],
+        "labels": [
+          {
+            "text": "Sign in with Google",
+            "element": "UButton"
+          }
+        ]
+      }
+    },
+    {
+      "name": "success",
+      "type": "page",
+      "route": "/auth/success",
+      "file": "app/pages/auth/success.vue",
+      "summaryDescriptionInLaymansTerms": "This page handles the post-authentication process, fetching user data and redirecting to the main application.",
+      "detailedUserActions": [
+        "Upon successful authentication, the system automatically fetches your user profile.",
+        "After your profile is loaded, you will be redirected to the appropriate section of the application."
+      ],
+      "visibleElements": [],
+      "conditionalStates": [],
+      "technicalImplementation": {
+        "components": [],
+        "functions": [
+          "fetchAuthData"
+        ],
+        "composables": [
+          "useRoute",
+          "useRouter",
+          "useAuthStore"
+        ],
+        "formFields": [],
+        "labels": []
+      }
+    },
+    {
+      "name": "index",
+      "type": "page",
+      "route": "/customers",
+      "file": "app/pages/customers/index.vue",
+      "summaryDescriptionInLaymansTerms": "This page displays a list of customers and allows you to add new customers or filter the existing list.",
+      "detailedUserActions": [
+        "Click the \"New customer\" button to open a modal for adding a new customer.",
+        "Type into the input field with placeholder \"Filter names...\" to search for customers by name."
+      ],
+      "visibleElements": [
+        "\"New customer\" button (UButton)",
+        "Input field with placeholder \"Filter names...\" (UInput)",
+        "Customer list table (UTable)"
+      ],
+      "conditionalStates": [],
+      "technicalImplementation": {
+        "components": [
+          "UInput",
+          "UButton",
+          "UTable"
+        ],
+        "functions": [
+          "openCreateModal",
+          "openEditModal",
+          "closeModal",
+          "performSubmit",
+          "goToContactPoints",
+          "addCustomer",
+          "removeCustomer",
+          "updateCustomer"
+        ],
+        "composables": [
+          "useNuxtApp",
+          "useRouter",
+          "useToast",
+          "useForm",
+          "useField",
+          "useTemplateRef"
+        ],
+        "formFields": [],
+        "labels": [
+          {
+            "text": "New customer",
+            "element": "UButton"
+          },
+          {
+            "text": "Filter names...",
+            "element": "UInput"
+          }
+        ]
+      }
+    },
+    {
+      "name": "[customerId]",
+      "type": "page",
+      "route": "/customers/:customerId",
+      "file": "app/pages/customers/[customerId].vue",
+      "summaryDescriptionInLaymansTerms": "This page displays detailed information for a specific customer, including their contact points and interactions, and allows managing them.",
+      "detailedUserActions": [
+        "Click the \"Add contact\" button to add a new contact point for this customer.",
+        "Click the \"Back to customers\" button to return to the main customer list.",
+        "Click on a row in the table to expand or collapse its details."
+      ],
+      "visibleElements": [
+        "\"Add contact\" button (UButton)",
+        "\"Back to customers\" button (UButton)",
+        "Loading indicator (AppLoading)",
+        "Contact points table (UTable)"
+      ],
+      "conditionalStates": [],
+      "technicalImplementation": {
+        "components": [
+          "UButton",
+          "AppLoading",
+          "UTable"
+        ],
+        "functions": [
+          "fetchCustomer",
+          "openCreateModal",
+          "openEditModal",
+          "closeModal",
+          "updateContactPoint",
+          "addContactPoint",
+          "removeContactPoint",
+          "addInteraction",
+          "handleInteractionSuccess",
+          "performSubmit"
+        ],
+        "composables": [
+          "useRoute",
+          "useRouter",
+          "useToast",
+          "useNuxtApp",
+          "useForm",
+          "useField"
+        ],
+        "formFields": [],
+        "labels": [
+          {
+            "text": "Add contact",
+            "element": "UButton"
+          },
+          {
+            "text": "Back to customers",
+            "element": "UButton"
+          }
+        ]
+      }
+    },
+    {
+      "name": "index",
+      "type": "page",
+      "route": "/dashboard",
+      "file": "app/pages/dashboard/index.vue",
+      "summaryDescriptionInLaymansTerms": "This page provides an overview or dashboard, potentially highlighting customers needing attention and offering a quick link to the customer list.",
+      "detailedUserActions": [
+        "Click the \"Go to Customers\" button to navigate to the customer management page."
+      ],
+      "visibleElements": [
+        "\"Go to Customers\" button (UButton)",
+        "Card component (UCard)",
+        "Table component (UTable)"
+      ],
+      "conditionalStates": [],
+      "technicalImplementation": {
+        "components": [
+          "UCard",
+          "UButton",
+          "UTable"
+        ],
+        "functions": [
+          "getDaysSinceLastInteraction",
+          "needsAttention",
+          "formatDate",
+          "goToCustomer"
+        ],
+        "composables": [
+          "useNuxtApp",
+          "useRouter",
+          "useTemplateRef"
+        ],
+        "formFields": [],
+        "labels": [
+          {
+            "text": "Go to Customers",
+            "element": "UButton"
+          }
+        ]
+      }
+    },
+    {
+      "name": "app",
+      "type": "component",
+      "route": "N/A",
+      "file": "app/app.vue",
+      "summaryDescriptionInLaymansTerms": "This is the main application wrapper, providing the overall structure, layout, and global components like the header and loading indicators.",
+      "detailedUserActions": [],
+      "visibleElements": [
+        "Application wrapper (UApp)",
+        "Header (ArkHeader)",
+        "Main content area (UMain)",
+        "Layout (NuxtLayout)",
+        "Loading indicator (AppLoading)",
+        "Page content (NuxtPage)"
+      ],
+      "conditionalStates": [],
+      "technicalImplementation": {
+        "components": [
+          "UApp",
+          "ArkHeader",
+          "UMain",
+          "NuxtLayout",
+          "AppLoading",
+          "NuxtPage"
+        ],
+        "functions": [],
+        "composables": [
+          "useAuthStore"
+        ],
+        "formFields": [],
+        "labels": []
+      }
+    },
+    {
+      "name": "ArkHeader",
+      "type": "component",
+      "route": "N/A",
+      "file": "app/components/ArkHeader.vue",
+      "summaryDescriptionInLaymansTerms": "This component represents the application's header, typically containing navigation or branding elements.",
+      "detailedUserActions": [],
+      "visibleElements": [
+        "Header (UHeader)"
+      ],
+      "conditionalStates": [],
+      "technicalImplementation": {
+        "components": [
+          "UHeader"
+        ],
+        "functions": [],
+        "composables": [
+          "useAuthStore",
+          "useRoute"
+        ],
+        "formFields": [],
+        "labels": []
+      }
+    },
+    {
+      "name": "DeleteContactPointModal",
+      "type": "component",
+      "route": "N/A",
+      "file": "app/components/DeleteContactPointModal.vue",
+      "summaryDescriptionInLaymansTerms": "This modal is used to confirm and perform the deletion of a specific contact point.",
+      "detailedUserActions": [
+        "Confirm the deletion of a contact point within the modal."
+      ],
+      "visibleElements": [
+        "\"Delete Contact Point\" modal (UModal)"
+      ],
+      "conditionalStates": [],
+      "technicalImplementation": {
+        "components": [
+          "UModal"
+        ],
+        "functions": [
+          "handleDelete"
+        ],
+        "composables": [
+          "useNuxtApp",
+          "useToast"
+        ],
+        "formFields": [],
+        "labels": [
+          {
+            "text": "Delete Contact Point",
+            "element": "UModal"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeleteCustomerModal",
+      "type": "component",
+      "route": "N/A",
+      "file": "app/components/DeleteCustomerModal.vue",
+      "summaryDescriptionInLaymansTerms": "This modal is used to confirm and perform the deletion of a specific customer.",
+      "detailedUserActions": [
+        "Confirm the deletion of a customer within the modal."
+      ],
+      "visibleElements": [
+        "\"Delete Customer\" modal (UModal)"
+      ],
+      "conditionalStates": [],
+      "technicalImplementation": {
+        "components": [
+          "UModal"
+        ],
+        "functions": [
+          "handleDelete"
+        ],
+        "composables": [
+          "useNuxtApp",
+          "useToast"
+        ],
+        "formFields": [],
+        "labels": [
+          {
+            "text": "Delete Customer",
+            "element": "UModal"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RecordInteractionModal",
+      "type": "component",
+      "route": "N/A",
+      "file": "app/components/RecordInteractionModal.vue",
+      "summaryDescriptionInLaymansTerms": "This modal allows you to record details about an interaction with a customer contact, including the date, type, and message.",
+      "detailedUserActions": [
+        "Fill in the \"Date\" field to specify when the interaction occurred.",
+        "Select the interaction type from the dropdown menu.",
+        "Enter details in the \"Message\" field (placeholder: \"Enter interaction details...\").",
+        "Submit the form to save the interaction."
+      ],
+      "visibleElements": [
+        "\"Record Interaction\" modal (UModal)",
+        "\"Date\" input field (UInput)",
+        "Type selection dropdown",
+        "\"Message\" text area (UTextarea) with placeholder \"Enter interaction details...\"",
+        "Submit button"
+      ],
+      "conditionalStates": [
+        "The \"Date\" input field is disabled while the form is being submitted (isSubmitting).",
+        "The type selection dropdown is disabled while the form is being submitted (isSubmitting).",
+        "The \"Message\" text area is disabled while the form is being submitted (isSubmitting).",
+        "The submit button is disabled if the form is invalid (!meta.valid) or currently submitting (isSubmitting)."
+      ],
+      "technicalImplementation": {
+        "components": [
+          "UModal",
+          "UFormField",
+          "UInput",
+          "UTextarea"
+        ],
+        "functions": [
+          "onSubmit"
+        ],
+        "composables": [
+          "useNuxtApp",
+          "useToast",
+          "useForm",
+          "useField"
+        ],
+        "formFields": [
+          {
+            "name": "date",
+            "type": "UInput",
+            "required": false,
+            "placeholder": ""
+          },
+          {
+            "name": "type",
+            "type": "select",
+            "required": false,
+            "placeholder": ""
+          },
+          {
+            "name": "message",
+            "type": "UTextarea",
+            "required": false,
+            "placeholder": "Enter interaction details..."
+          }
+        ],
+        "labels": [
+          {
+            "text": "Date",
+            "element": "UInput"
+          },
+          {
+            "text": "Message",
+            "element": "UTextarea"
+          },
+          {
+            "text": "Enter interaction details...",
+            "element": "UTextarea"
+          },
+          {
+            "text": "Record Interaction",
+            "element": "UModal"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ThemeSelector",
+      "type": "component",
+      "route": "N/A",
+      "file": "app/components/ThemeSelector.vue",
+      "summaryDescriptionInLaymansTerms": "This component allows users to select and change the application's visual theme.",
+      "detailedUserActions": [
+        "Click a button to open a popover with theme options.",
+        "Select a theme from the options to apply it to the application."
+      ],
+      "visibleElements": [
+        "Theme selection popover (UPopover)",
+        "Button to trigger theme selection (UButton)"
+      ],
+      "conditionalStates": [],
+      "technicalImplementation": {
+        "components": [
+          "UPopover",
+          "UButton"
+        ],
+        "functions": [
+          "handleThemeSelect"
+        ],
+        "composables": [
+          "useTheme"
+        ],
+        "formFields": [],
+        "labels": []
+      }
+    }
+  ]
+}

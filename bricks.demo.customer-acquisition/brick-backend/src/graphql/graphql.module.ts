@@ -1,33 +1,56 @@
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
-import { GqlAuthGuard } from 'src/common/guards/gql-auth.guard';
-import { ContactPointsModule } from 'src/contact-points/contact-points.module';
-import { CustomersModule } from 'src/customers/customers.module';
-import { EmployeesModule } from 'src/employees/employees.module';
-import { HelloModule } from 'src/hello/hello.module';
-import { InteractionSummariesModule } from 'src/interaction-summaries/interaction-summaries.module';
+
+import { EmployeeLoader } from '../employee/employee.loader';
+import { ProjectLoader } from '../project/project.loader';
+import { EmployeeModule } from '../employee/employee.module';
+import { ProjectModule } from '../project/project.module';
+import { GqlExceptionFilter } from '../common/filters/gql-exception.filter';
 
 @Module({
   imports: [
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    EmployeeModule,
+    ProjectModule,
+
+    GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      graphiql: true,
+      imports: [EmployeeModule, ProjectModule],
+      inject: [EmployeeLoader, ProjectLoader],
+
+      useFactory: (
+        employeeLoader: EmployeeLoader,
+        projectLoader: ProjectLoader,
+      ) => ({
+        autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+        sortSchema: true,
+
+        context: ({ req }) => ({
+          req,
+          loaders: {
+            employeeLoader: employeeLoader.loader,
+            projectLoader: projectLoader.loader,
+          },
+        }),
+        formatError: (error) => {
+          const extensions = (error as any).extensions || {};
+          // Si ya trae success false, retornamos tal cual (estandarizado por el filtro)
+          if (extensions.success === false) {
+            return extensions;
+          }
+          const code = extensions.code || 'INTERNAL_ERROR';
+          return {
+            success: false,
+            code,
+            message: error.message,
+            details: extensions,
+            timestamp: new Date().toISOString(),
+            path: error.path,
+          };
+        },
+      }),
     }),
-    HelloModule,
-    CustomersModule,
-    ContactPointsModule,
-    EmployeesModule,
-    InteractionSummariesModule,
-  ],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: GqlAuthGuard,
-    },
   ],
 })
-export class GqlModule {}
+export class GqlAppModule {}

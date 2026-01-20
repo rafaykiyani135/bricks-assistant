@@ -1,50 +1,27 @@
-export type Theme = 'red' | 'yellow' | 'blue' | 'green';
-
-const THEME_STORAGE_KEY = 'app-theme';
-const DEFAULT_THEME: Theme = 'blue';
-
 export const useTheme = () => {
-  const theme = useState<Theme>('theme', () => {
-    if (import.meta.client) {
-      const stored = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
-      return stored || DEFAULT_THEME;
-    }
-    return DEFAULT_THEME;
-  });
+  const colorMode = useColorMode()
 
-  const setTheme = (newTheme: Theme) => {
-    theme.value = newTheme;
-    if (import.meta.client) {
-      localStorage.setItem(THEME_STORAGE_KEY, newTheme);
-      applyTheme(newTheme);
-    }
-  };
+  // Función para alternar entre modo claro y oscuro
+  const toggleTheme = () => {
+    colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+  }
 
-  const applyTheme = (themeName: Theme) => {
-    if (import.meta.client) {
-      const html = document.documentElement;
-      html.classList.remove(
-        'theme-red',
-        'theme-yellow',
-        'theme-blue',
-        'theme-green',
-      );
-      html.classList.add(`theme-${themeName}`);
-    }
-  };
+  // Función para establecer un tema específico
+  const setTheme = (theme: 'light' | 'dark' | 'system') => {
+    colorMode.preference = theme
+  }
 
-  watch(
-    theme,
-    (newTheme) => {
-      if (import.meta.client) {
-        applyTheme(newTheme);
-      }
-    },
-    { immediate: true },
-  );
+  // Obtener el tema actual
+  const currentTheme = computed(() => colorMode.value)
+  const isDark = computed(() => colorMode.value === 'dark')
+  const isLight = computed(() => colorMode.value === 'light')
 
   return {
-    theme: readonly(theme),
+    toggleTheme,
     setTheme,
-  };
-};
+    currentTheme,
+    isDark,
+    isLight,
+    colorMode
+  }
+}

@@ -1,0 +1,814 @@
+{
+  "elements": [
+    {
+      "name": "dashboard",
+      "type": "page",
+      "route": "/dashboard",
+      "file": "app/pages/dashboard.vue",
+      "summaryDescriptionInLaymansTerms": "This page provides an overview of all projects, displaying key metrics like total revenue, cost, and average margin. It also allows users to sort the project list.",
+      "detailedUserActions": [
+        "Select a sorting option from the dropdown menu to reorder the project list.",
+        "Click on a project (implied by UButton/div actions) to view its detailed information."
+      ],
+      "visibleElements": [
+        "\"Error loading projects\" alert (UAlert)",
+        "Sorting dropdown (select element)",
+        "Icons (UIcon)",
+        "Buttons (UButton)",
+        "Cards (UCard)"
+      ],
+      "conditionalStates": [
+        "An \"Error loading projects\" alert is displayed if there's an issue fetching project data."
+      ],
+      "dataProvenance": [
+        "Project summaries are fetched from an API using `useQuery` and stored in `result`.",
+        "`projectsData` is derived from `projectSummaries`, mapping each summary to detailed project information including ID, name, client, start date, estimated end date, total cost, expected revenue, net margin, and job count.",
+        "`totalRevenue` is calculated by summing the `expectedRevenue` of all projects in `projectsData`.",
+        "`totalCost` is calculated by summing the `totalCost` of all projects in `projectsData`.",
+        "`averageMargin` is calculated by summing the `netMargin` of all projects in `projectsData` and dividing by the total number of projects. If there are no projects, the average margin is 0.",
+        "`sortedProjects` are derived from `projectsData` and ordered based on the selected `sortBy` field. Dates are sorted most recent first, other fields alphabetically or numerically."
+      ],
+      "businessLogic": [
+        "The `averageMarginClass` determines the color of the average margin display: green for >= 25%, yellow for >= 15%, and red for less than 15%.",
+        "Projects can be sorted by 'Name (A-Z)', 'Client (A-Z)', 'Start date (most recent)', 'Total cost (highest to lowest)', 'Expected revenue (highest to lowest)', 'Net margin (highest to lowest)', and 'Number of jobs (most to least)'."
+      ],
+      "technicalImplementation": {
+        "components": [
+          "UIcon",
+          "UButton",
+          "UCard",
+          "UAlert"
+        ],
+        "functions": [
+          "projectSummaries",
+          "projectsData",
+          "totalRevenue",
+          "totalCost",
+          "averageMargin",
+          "averageMarginClass",
+          "sortedProjects",
+          "formatDisplayDate",
+          "getMarginClass",
+          "getMarginBarClass"
+        ],
+        "composables": [
+          "useQuery"
+        ],
+        "formFields": [
+          {
+            "name": "sortBy",
+            "type": "select",
+            "required": false,
+            "placeholder": ""
+          }
+        ],
+        "labels": [
+          {
+            "text": "Error loading projects",
+            "element": "UAlert"
+          }
+        ]
+      }
+    },
+    {
+      "name": "index",
+      "type": "page",
+      "route": "/",
+      "file": "app/pages/index.vue",
+      "summaryDescriptionInLaymansTerms": "This is the landing page of the application, providing navigation to other sections.",
+      "detailedUserActions": [
+        "Click on a card (UCard) to navigate to a different section of the application."
+      ],
+      "visibleElements": [
+        "Cards (UCard)",
+        "Icons (UIcon)"
+      ],
+      "conditionalStates": [],
+      "dataProvenance": [],
+      "businessLogic": [],
+      "technicalImplementation": {
+        "components": [
+          "UCard",
+          "UIcon"
+        ],
+        "functions": [],
+        "composables": [],
+        "formFields": [],
+        "labels": []
+      }
+    },
+    {
+      "name": "login",
+      "type": "page",
+      "route": "/login",
+      "file": "app/pages/login.vue",
+      "summaryDescriptionInLaymansTerms": "This page allows users to log into the application using their email and password.",
+      "detailedUserActions": [
+        "Enter your email address into the email input field.",
+        "Enter your password into the password input field.",
+        "Submit the form to log in.",
+        "Click the button to pre-populate the email and password fields with demo data."
+      ],
+      "visibleElements": [
+        "Email input field",
+        "Password input field",
+        "Button"
+      ],
+      "conditionalStates": [
+        "The button (for login or demo credentials) is disabled while the login process is in progress (loading)."
+      ],
+      "dataProvenance": [],
+      "businessLogic": [
+        "Both email and password fields are required for login."
+      ],
+      "technicalImplementation": {
+        "components": [],
+        "functions": [
+          "onLogin",
+          "fillDemoCredentials"
+        ],
+        "composables": [
+          "useAuth"
+        ],
+        "formFields": [
+          {
+            "name": "email",
+            "type": "input",
+            "required": true,
+            "placeholder": ""
+          },
+          {
+            "name": "password",
+            "type": "input",
+            "required": true,
+            "placeholder": ""
+          }
+        ],
+        "labels": []
+      }
+    },
+    {
+      "name": "index",
+      "type": "page",
+      "route": "/projects",
+      "file": "app/pages/projects/index.vue",
+      "summaryDescriptionInLaymansTerms": "This page displays a list of all projects and allows users to create new projects.",
+      "detailedUserActions": [
+        "Click a button (UButton) to toggle the new project form visibility.",
+        "After a project is successfully created, the project list will refresh."
+      ],
+      "visibleElements": [
+        "Button (UButton)",
+        "Project form (ProjectForm component)",
+        "Project cards (UCard)",
+        "Project header (ProjectHeader component)",
+        "Cost breakdown card (CostBreakdownCard component)",
+        "NuxtLink"
+      ],
+      "conditionalStates": [],
+      "dataProvenance": [
+        "The project list is refreshed after a new project is created."
+      ],
+      "businessLogic": [],
+      "technicalImplementation": {
+        "components": [
+          "UButton",
+          "ProjectForm",
+          "UCard",
+          "ProjectHeader",
+          "CostBreakdownCard",
+          "NuxtLink"
+        ],
+        "functions": [
+          "toggleForm",
+          "onProjectCreated"
+        ],
+        "composables": [
+          "useProjects"
+        ],
+        "formFields": [],
+        "labels": []
+      }
+    },
+    {
+      "name": "new",
+      "type": "page",
+      "route": "/projects/new",
+      "file": "app/pages/projects/new.vue",
+      "summaryDescriptionInLaymansTerms": "This page provides a dedicated form for creating a new project.",
+      "detailedUserActions": [],
+      "visibleElements": [
+        "NuxtLink",
+        "UIcon",
+        "Project form (ProjectForm component)"
+      ],
+      "conditionalStates": [],
+      "dataProvenance": [],
+      "businessLogic": [],
+      "technicalImplementation": {
+        "components": [
+          "NuxtLink",
+          "UIcon",
+          "ProjectForm"
+        ],
+        "functions": [],
+        "composables": [
+          "useHead"
+        ],
+        "formFields": [],
+        "labels": []
+      }
+    },
+    {
+      "name": "[id]",
+      "type": "page",
+      "route": "/projects/:id",
+      "file": "app/pages/projects/[id].vue",
+      "summaryDescriptionInLaymansTerms": "This page displays the detailed view of a specific project, including its jobs and financial breakdown, and allows for editing jobs or the project itself.",
+      "detailedUserActions": [
+        "Click a button (UButton) to show the quote summary.",
+        "Click a button (UButton) to open a modal for adding a new job.",
+        "Click a button (UButton) to edit a specific job, which opens a slideover panel.",
+        "Click a button (UButton) to close the job editing slideover.",
+        "After a job is saved, the slideover closes and the project data is refreshed.",
+        "After a new job is created, the add job modal closes and the project data is refreshed.",
+        "Click a button (UButton) to open a modal for editing the project details.",
+        "After project details are saved, the edit project modal closes and the project data is refreshed."
+      ],
+      "visibleElements": [
+        "NuxtLink",
+        "Buttons (UButton)",
+        "Project header (ProjectHeader component)",
+        "Cost breakdown card (CostBreakdownCard component)",
+        "Cards (UCard)",
+        "Slideover panel (USlideover)"
+      ],
+      "conditionalStates": [
+        "Buttons related to jobs are disabled if the project has no jobs.",
+        "A slideover panel (`USlideover`) is used to edit jobs, which opens and closes based on user actions."
+      ],
+      "dataProvenance": [
+        "The project ID is extracted from the route parameters.",
+        "The `activeJob` is found within the project's jobs based on `activeJobId`.",
+        "Project data is refreshed after jobs or project details are saved."
+      ],
+      "businessLogic": [
+        "The `id` of the project is derived from the URL parameter and converted to a number.",
+        "The `activeJob` is identified by matching its ID with the `activeJobId`."
+      ],
+      "technicalImplementation": {
+        "components": [
+          "NuxtLink",
+          "UButton",
+          "ProjectHeader",
+          "CostBreakdownCard",
+          "UCard",
+          "USlideover"
+        ],
+        "functions": [
+          "id",
+          "activeJob",
+          "edit",
+          "closeSlideover",
+          "onSaved",
+          "onJobCreated",
+          "onEditProject",
+          "onProjectSaved"
+        ],
+        "composables": [
+          "useRoute",
+          "useProject"
+        ],
+        "formFields": [
+          {
+            "name": "isSlideoverOpen",
+            "type": "USlideover",
+            "required": false,
+            "placeholder": ""
+          }
+        ],
+        "labels": []
+      }
+    },
+    {
+      "name": "app",
+      "type": "component",
+      "route": "N/A",
+      "file": "app/app.vue",
+      "summaryDescriptionInLaymansTerms": "This is the root component of the application, responsible for setting up the main layout and rendering pages.",
+      "detailedUserActions": [],
+      "visibleElements": [
+        "Main application container (UApp)",
+        "Main content area (UMain)",
+        "NuxtLayout",
+        "NuxtPage"
+      ],
+      "conditionalStates": [],
+      "dataProvenance": [],
+      "businessLogic": [],
+      "technicalImplementation": {
+        "components": [
+          "UApp",
+          "UMain",
+          "NuxtLayout",
+          "NuxtPage"
+        ],
+        "functions": [],
+        "composables": [],
+        "formFields": [],
+        "labels": []
+      }
+    },
+    {
+      "name": "ArkHeader",
+      "type": "component",
+      "route": "N/A",
+      "file": "app/components/ArkHeader.vue",
+      "summaryDescriptionInLaymansTerms": "This component provides the application's header, including the brand name, theme toggle, and user information with a logout option.",
+      "detailedUserActions": [
+        "Click the \"Logout\" button to sign out of the application.",
+        "Click the theme toggle (ThemeToggle component) to switch between light and dark modes."
+      ],
+      "visibleElements": [
+        "\"Brickcode\" title (UHeader)",
+        "\"Logout\" button",
+        "Theme toggle (ThemeToggle component)",
+        "User display name",
+        "User role"
+      ],
+      "conditionalStates": [],
+      "dataProvenance": [
+        "User display name is derived from the current user's employee name, username, or email.",
+        "User role is mapped from technical role names (e.g., 'ADMIN' to 'Administrator')."
+      ],
+      "businessLogic": [
+        "The `getUserDisplayName` function prioritizes displaying the employee name, then username, then email for the current user.",
+        "The `getUserRole` function maps internal role codes (e.g., 'ADMIN') to more user-friendly labels (e.g., 'Administrator')."
+      ],
+      "technicalImplementation": {
+        "components": [
+          "UHeader",
+          "NuxtLink",
+          "ThemeToggle",
+          "ClientOnly"
+        ],
+        "functions": [
+          "handleLogout",
+          "getUserDisplayName",
+          "getUserRole"
+        ],
+        "composables": [
+          "useAuth"
+        ],
+        "formFields": [],
+        "labels": [
+          {
+            "text": "Brickcode",
+            "element": "UHeader"
+          },
+          {
+            "text": "Logout",
+            "element": "button"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AddJobForm",
+      "type": "component",
+      "route": "N/A",
+      "file": "app/components/jobs/AddJobForm.vue",
+      "summaryDescriptionInLaymansTerms": "This form allows users to add a new job to a specific project, including details like title, category, complexity, price, and assigned employee.",
+      "detailedUserActions": [
+        "Fill in the 'title' field for the job.",
+        "Select a 'category' for the job.",
+        "Enter the 'estimatedComplexity' for the job.",
+        "Enter the 'price' for the job.",
+        "Optionally, select an 'assignedEmployeeId' for the job.",
+        "Submit the form to create the job.",
+        "Click a button (UButton) to cancel or close the form."
+      ],
+      "visibleElements": [
+        "Card (UCard)",
+        "Button (UButton)"
+      ],
+      "conditionalStates": [
+        "Form fields are validated as the user interacts with them, showing error messages for invalid input.",
+        "The submit button is disabled if the form is invalid or currently submitting."
+      ],
+      "dataProvenance": [
+        "The `projectId` is passed as a prop to associate the job with a project.",
+        "`currentJobs` are derived from the project's existing jobs.",
+        "`availableEmployees` are filtered from all employees, considering their availability and ensuring the currently assigned employee (if any) is included."
+      ],
+      "businessLogic": [
+        "Title is required, must be between 3 and 100 characters.",
+        "Category is required and must be one of 'ELECTRICAL', 'PLUMBING', 'CARPENTRY', 'PAINTING', 'OTHER'.",
+        "Estimated complexity and price are required and must be positive numbers.",
+        "The form is considered valid only if all required fields are filled and there are no validation errors.",
+        "Upon successful job creation, a toast notification is displayed."
+      ],
+      "technicalImplementation": {
+        "components": [
+          "UCard",
+          "UButton"
+        ],
+        "functions": [
+          "currentJobs",
+          "availableEmployees",
+          "validateField",
+          "validateSingleField",
+          "isFormValid",
+          "onSubmit",
+          "resetForm"
+        ],
+        "composables": [
+          "useCreateJob",
+          "useEmployees",
+          "useProject",
+          "useToast",
+          "useEmployeeAvailability"
+        ],
+        "formFields": [],
+        "labels": []
+      }
+    },
+    {
+      "name": "JobForm",
+      "type": "component",
+      "route": "N/A",
+      "file": "app/components/jobs/JobForm.vue",
+      "summaryDescriptionInLaymansTerms": "This form is used to edit an existing job's details, including its title, estimated complexity, price, and assigned employee. It also calculates the estimated job cost.",
+      "detailedUserActions": [
+        "Enter or update the \"Job title\" in the input field.",
+        "Adjust the estimated complexity and price.",
+        "Select an employee from the dropdown to assign or reassign the job.",
+        "Click a button (UButton) to confirm an employee reassignment.",
+        "Click a button (UButton) to cancel an employee reassignment.",
+        "Click a button (UButton) to reset the form fields to their initial state.",
+        "Submit the form to save the updated job details."
+      ],
+      "visibleElements": [
+        "Card (UCard)",
+        "\"Job title\" input field (UInput) with placeholder \"Job title\"",
+        "Buttons (UButton)",
+        "Assigned employee selection dropdown (select element)"
+      ],
+      "conditionalStates": [
+        "The assigned employee dropdown is disabled while employee data is loading.",
+        "Individual employee options in the dropdown are disabled if the employee is not available.",
+        "The submit button is disabled while the form is submitting or if the form is invalid.",
+        "A confirmation dialog appears if an employee is being reassigned."
+      ],
+      "dataProvenance": [
+        "The `jobId` and `projectId` are passed as props to identify the job and its project.",
+        "`currentJobs` are derived from the project's jobs.",
+        "`employeeOptions` are generated from available employees, including their roles, hourly costs, and availability.",
+        "`selectedEmployeeDetails` are derived from the chosen employee in the dropdown, including their name, role, hourly cost, and productivity.",
+        "`estimatedJobCost` is calculated based on the job's `estimatedComplexity`, the `selectedEmployeeDetails`'s `hourlyCost`, and `productivity`."
+      ],
+      "businessLogic": [
+        "Form fields are validated against a schema, and error messages are displayed for invalid input.",
+        "The form is considered valid (`isValid`) if all required fields are filled and there are no validation errors.",
+        "If an employee is reassigned, a confirmation dialog is shown before the change is applied.",
+        "The estimated job cost is calculated as `(estimatedComplexity / employeeProductivity) * employeeHourlyRate`.",
+        "Required fields for validation include 'title', 'estimatedComplexity', 'price', and 'assignedEmployeeId'."
+      ],
+      "technicalImplementation": {
+        "components": [
+          "UCard",
+          "UInput",
+          "UButton"
+        ],
+        "functions": [
+          "currentJobs",
+          "excludeJobId",
+          "employeeOptions",
+          "selectedEmployeeDetails",
+          "estimatedJobCost",
+          "getEmployeeName",
+          "validateField",
+          "validateAll",
+          "computeValid",
+          "onSubmit",
+          "reset",
+          "onEmployeeChange",
+          "confirmReassignment",
+          "cancelReassignment"
+        ],
+        "composables": [
+          "useEmployees",
+          "useProject",
+          "useEmployeeAvailability",
+          "useToast",
+          "useUpdateJob"
+        ],
+        "formFields": [
+          {
+            "name": "form.title",
+            "type": "UInput",
+            "required": false,
+            "placeholder": "Job title"
+          },
+          {
+            "name": "form.assignedEmployeeId",
+            "type": "select",
+            "required": false,
+            "placeholder": ""
+          }
+        ],
+        "labels": [
+          {
+            "text": "Job title",
+            "element": "UInput"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CostBreakdownCard",
+      "type": "component",
+      "route": "N/A",
+      "file": "app/components/projects/CostBreakdownCard.vue",
+      "summaryDescriptionInLaymansTerms": "This component displays a summary of a project's financial metrics, including total cost, expected revenue, and net margin.",
+      "detailedUserActions": [],
+      "visibleElements": [
+        "Card (UCard)",
+        "Badges (UBadge)"
+      ],
+      "conditionalStates": [],
+      "dataProvenance": [
+        "All financial data (jobs, total cost, expected revenue, net margin) is passed as a `project` prop.",
+        "`jobs`, `totalCost`, `expectedRevenue`, and `netMargin` are directly derived from the `project` prop."
+      ],
+      "businessLogic": [],
+      "technicalImplementation": {
+        "components": [
+          "UCard",
+          "UBadge"
+        ],
+        "functions": [
+          "jobs",
+          "totalCost",
+          "expectedRevenue",
+          "netMargin"
+        ],
+        "composables": [],
+        "formFields": [],
+        "labels": []
+      }
+    },
+    {
+      "name": "EditProjectForm",
+      "type": "component",
+      "route": "N/A",
+      "file": "app/components/projects/EditProjectForm.vue",
+      "summaryDescriptionInLaymansTerms": "This form allows users to edit the details of an existing project, such as its name, client, start date, and estimated end date.",
+      "detailedUserActions": [
+        "Enter or update the project's name in the input field (placeholder: \"Ex: Kitchen renovation\").",
+        "Enter or update the client's name in the input field (placeholder: \"Ex: John Doe\").",
+        "Select or update the project's start date.",
+        "Select or update the project's estimated end date.",
+        "Submit the form to save the updated project details.",
+        "Click a button (UButton) to cancel or close the form."
+      ],
+      "visibleElements": [
+        "Project name input field (UInput) with placeholder \"Ex: Kitchen renovation\"",
+        "Client name input field (UInput) with placeholder \"Ex: John Doe\"",
+        "Start date input field (UInput)",
+        "Estimated end date input field (UInput)",
+        "Buttons (UButton)"
+      ],
+      "conditionalStates": [
+        "The save button is disabled while the form is submitting (loading).",
+        "The save button is disabled if the form is invalid.",
+        "Form fields are validated as the user interacts with them, showing error messages for invalid input."
+      ],
+      "dataProvenance": [
+        "The `project` object and `projectId` are passed as props to pre-fill and identify the project being edited."
+      ],
+      "businessLogic": [
+        "Project name is required, must be between 3 and 100 characters.",
+        "Client name is required, must be between 2 and 100 characters.",
+        "Start date and estimated end date are required.",
+        "The form is considered valid (`isFormValid`) if all required fields are filled and there are no validation errors.",
+        "Upon successful project update, a toast notification is displayed."
+      ],
+      "technicalImplementation": {
+        "components": [
+          "UInput",
+          "UButton"
+        ],
+        "functions": [
+          "validateField",
+          "validateSingleField",
+          "isFormValid",
+          "onSubmit"
+        ],
+        "composables": [
+          "useUpdateProject",
+          "useToast"
+        ],
+        "formFields": [
+          {
+            "name": "form.name",
+            "type": "UInput",
+            "required": true,
+            "placeholder": "Ex: Kitchen renovation"
+          },
+          {
+            "name": "form.client",
+            "type": "UInput",
+            "required": true,
+            "placeholder": "Ex: John Doe"
+          },
+          {
+            "name": "form.startDate",
+            "type": "UInput",
+            "required": true,
+            "placeholder": ""
+          },
+          {
+            "name": "form.estimatedEndDate",
+            "type": "UInput",
+            "required": true,
+            "placeholder": ""
+          }
+        ],
+        "labels": [
+          {
+            "text": "Ex: Kitchen renovation",
+            "element": "UInput"
+          },
+          {
+            "text": "Ex: John Doe",
+            "element": "UInput"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProjectForm",
+      "type": "component",
+      "route": "N/A",
+      "file": "app/components/projects/ProjectForm.vue",
+      "summaryDescriptionInLaymansTerms": "This form allows users to create a new project by providing its name, client, start date, and estimated end date.",
+      "detailedUserActions": [
+        "Enter the project's name in the input field.",
+        "Enter the client's name in the input field.",
+        "Select the project's start date (defaults to today).",
+        "Select the project's estimated end date.",
+        "Submit the form to create the new project."
+      ],
+      "visibleElements": [
+        "Card (UCard)"
+      ],
+      "conditionalStates": [
+        "Form fields are validated as the user interacts with them, showing error messages for invalid input.",
+        "The create project button is disabled if the form is invalid or currently submitting."
+      ],
+      "dataProvenance": [],
+      "businessLogic": [
+        "Project name is required, must be between 3 and 100 characters.",
+        "Client name is required, must be between 2 and 100 characters.",
+        "Start date and estimated end date are required.",
+        "The start date defaults to the current day.",
+        "The estimated end date must be on or after the start date.",
+        "The form is considered valid (`isFormValid`) if all required fields are filled and there are no validation errors.",
+        "Upon successful project creation, a toast notification is displayed."
+      ],
+      "technicalImplementation": {
+        "components": [
+          "UCard"
+        ],
+        "functions": [
+          "validateField",
+          "validateForm",
+          "validateSingleField",
+          "isFormValid",
+          "onSubmit",
+          "resetForm"
+        ],
+        "composables": [
+          "useCreateProject",
+          "useToast"
+        ],
+        "formFields": [],
+        "labels": []
+      }
+    },
+    {
+      "name": "ProjectHeader",
+      "type": "component",
+      "route": "N/A",
+      "file": "app/components/projects/ProjectHeader.vue",
+      "summaryDescriptionInLaymansTerms": "This component displays the header for a project, including its name, client, and key dates, with an optional edit button.",
+      "detailedUserActions": [
+        "Click the edit button (UButton) to modify project details."
+      ],
+      "visibleElements": [
+        "Buttons (UButton)",
+        "Badges (UBadge)"
+      ],
+      "conditionalStates": [
+        "An edit button is shown if `showEditButton` prop is true."
+      ],
+      "dataProvenance": [
+        "All project details (name, client, dates) are passed as a `project` prop."
+      ],
+      "businessLogic": [
+        "Dates are formatted for display (e.g., 'Jan 1, 2023')."
+      ],
+      "technicalImplementation": {
+        "components": [
+          "UButton",
+          "UBadge"
+        ],
+        "functions": [
+          "formatDate"
+        ],
+        "composables": [],
+        "formFields": [],
+        "labels": []
+      }
+    },
+    {
+      "name": "QuoteSummary",
+      "type": "component",
+      "route": "N/A",
+      "file": "app/components/projects/QuoteSummary.vue",
+      "summaryDescriptionInLaymansTerms": "This component generates and displays a detailed summary of a project's quote, including job counts, total hours, costs, revenue, and margin, with options to print or share.",
+      "detailedUserActions": [
+        "Click a button (UButton) to print the quote summary.",
+        "Click a button (UButton) to share the quote summary via native sharing options or copy to clipboard.",
+        "Click a button (UButton) to close the summary view."
+      ],
+      "visibleElements": [
+        "Card (UCard)",
+        "Buttons (UButton)"
+      ],
+      "conditionalStates": [],
+      "dataProvenance": [
+        "All project and job details are passed as a `project` prop.",
+        "`totalJobs` is the count of jobs in the project.",
+        "`totalHours` is the sum of `estimatedComplexity` for all jobs.",
+        "`totalCost` is the sum of `price` for all jobs.",
+        "`netMargin` is calculated as `expectedRevenue - totalCost`.",
+        "`netMarginPercentage` is calculated as `(netMargin / expectedRevenue) * 100`."
+      ],
+      "businessLogic": [
+        "Dates are formatted for display.",
+        "Job categories are mapped from technical codes to user-friendly labels (e.g., 'ELECTRICAL' to 'Electrical').",
+        "The `printSummary` function opens a new window and prints the content of the quote summary.",
+        "The `shareSummary` function attempts to use the browser's native share API; if unavailable, it copies the summary text to the clipboard."
+      ],
+      "technicalImplementation": {
+        "components": [
+          "UCard",
+          "UButton"
+        ],
+        "functions": [
+          "totalJobs",
+          "totalHours",
+          "totalCost",
+          "netMargin",
+          "netMarginPercentage",
+          "formatDate",
+          "formatDateTime",
+          "formatCategory",
+          "printSummary",
+          "shareSummary",
+          "copyToClipboard"
+        ],
+        "composables": [],
+        "formFields": [],
+        "labels": []
+      }
+    },
+    {
+      "name": "ThemeToggle",
+      "type": "component",
+      "route": "N/A",
+      "file": "app/components/ThemeToggle.vue",
+      "summaryDescriptionInLaymansTerms": "This component allows users to switch between different visual themes (e.g., light and dark mode) for the application.",
+      "detailedUserActions": [
+        "Click the button to toggle the application's theme."
+      ],
+      "visibleElements": [
+        "Button"
+      ],
+      "conditionalStates": [],
+      "dataProvenance": [],
+      "businessLogic": [],
+      "technicalImplementation": {
+        "components": [],
+        "functions": [],
+        "composables": [
+          "useTheme"
+        ],
+        "formFields": [],
+        "labels": []
+      }
+    }
+  ]
+}
