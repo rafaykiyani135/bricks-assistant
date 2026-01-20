@@ -4,6 +4,12 @@ const loading = ref(false);
 const query = ref("");
 const scrollArea = ref<HTMLElement | null>(null);
 
+const selectedLanguage = ref("English");
+const languages = [
+  { label: "EN", value: "English" },
+  { label: "FR", value: "French" },
+];
+
 // Simple formatter to parse basic Markdown for better readability
 function formatMessage(content: string) {
   let formatted = content
@@ -67,6 +73,7 @@ async function sendMessage() {
       body: {
         query: userMsg,
         history: history,
+        language: selectedLanguage.value,
       },
     });
 
@@ -96,20 +103,36 @@ function scrollToBottom() {
   <UContainer class="py-10 max-w-4xl">
     <UCard :ui="{ body: { padding: 'p-0 sm:p-0' } }">
       <template #header>
-        <div class="flex items-center gap-3">
-          <div class="p-2 bg-primary-50 dark:bg-primary-950 rounded-lg">
-            <UIcon
-              name="i-heroicons-chat-bubble-left-right"
-              class="w-6 h-6 text-primary"
-            />
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="p-2 bg-primary-50 dark:bg-primary-950 rounded-lg">
+              <UIcon
+                name="i-heroicons-chat-bubble-left-right"
+                class="w-6 h-6 text-primary"
+              />
+            </div>
+            <div>
+              <h1 class="text-xl font-bold text-gray-900 dark:text-white">
+                Project Assistant
+              </h1>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Ask questions about your documentation and specs
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 class="text-xl font-bold text-gray-900 dark:text-white">
-              Project Assistant
-            </h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              Ask questions about your documentation and specs
-            </p>
+
+          <div class="flex items-center gap-2">
+            <UButtonGroup size="sm">
+              <UButton
+                v-for="l in languages"
+                :key="l.value"
+                :color="selectedLanguage === l.value ? 'primary' : 'gray'"
+                :variant="selectedLanguage === l.value ? 'solid' : 'ghost'"
+                @click="selectedLanguage = l.value"
+              >
+                {{ l.label }}
+              </UButton>
+            </UButtonGroup>
           </div>
         </div>
       </template>

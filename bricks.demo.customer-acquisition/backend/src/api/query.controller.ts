@@ -3,7 +3,7 @@ import { queryKnowledgeBase, classifyIntent, queryHybridFrontendSpecs } from '..
 
 export async function queryKB(req: Request, res: Response) {
     try {
-        const { query, tableName, history } = req.body;
+        const { query, tableName, history, language = 'English' } = req.body;
 
         if (!query) {
             return res.status(400).json({ error: 'Query string is required' });
@@ -15,7 +15,7 @@ export async function queryKB(req: Request, res: Response) {
         // I'll default to 'frontend_knowledge_base_v1' as per the function default, 
         // but the user can override it.
 
-        console.log(`Processing query: "${query}"`);
+        console.log(`Processing query: "${query}" (Language: ${language})`);
 
         let targetTable = tableName;
 
@@ -34,8 +34,8 @@ export async function queryKB(req: Request, res: Response) {
         }
 
         const result = targetTable === 'HYBRID_FRONTEND_SPECS'
-            ? await queryHybridFrontendSpecs(query, history)
-            : await queryKnowledgeBase(query, targetTable, history);
+            ? await queryHybridFrontendSpecs(query, history, language)
+            : await queryKnowledgeBase(query, targetTable, history, language);
 
         res.json(result);
     } catch (error: any) {

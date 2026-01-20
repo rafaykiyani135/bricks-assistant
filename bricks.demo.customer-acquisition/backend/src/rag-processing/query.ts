@@ -71,7 +71,7 @@ USER QUESTION: "${query}"
     }
 }
 
-export async function queryKnowledgeBase(query: string, tableName: string = 'frontend_knowledge_base_v1', history: string[] = []): Promise<QueryResult> {
+export async function queryKnowledgeBase(query: string, tableName: string = 'frontend_knowledge_base_v1', history: string[] = [], language: string = 'English'): Promise<QueryResult> {
     const dbDir = path.resolve(__dirname, '../../lancedb_data');
     if (!fs.existsSync(dbDir)) {
         throw new Error(`Database directory not found at ${dbDir}. Please run ingestion first.`);
@@ -100,7 +100,7 @@ export async function queryKnowledgeBase(query: string, tableName: string = 'fro
     }
 
     const retrievedContexts = results.map((r: any) => r.text);
-    const answer = await generateAnswer(query, retrievedContexts, history);
+    const answer = await generateAnswer(query, retrievedContexts, history, language);
 
     return {
         answer,
@@ -116,7 +116,7 @@ export async function queryKnowledgeBase(query: string, tableName: string = 'fro
 /**
  * Hybrid search across Frontend and Specs tables
  */
-export async function queryHybridFrontendSpecs(query: string, history: string[] = []): Promise<QueryResult> {
+export async function queryHybridFrontendSpecs(query: string, history: string[] = [], language: string = 'English'): Promise<QueryResult> {
     const dbDir = path.resolve(__dirname, '../../lancedb_data');
     if (!fs.existsSync(dbDir)) {
         throw new Error(`Database directory not found at ${dbDir}. Please run ingestion first.`);
@@ -157,7 +157,7 @@ export async function queryHybridFrontendSpecs(query: string, history: string[] 
     }
 
     const retrievedContexts = topResults.map((r: any) => r.text);
-    const answer = await generateAnswer(query, retrievedContexts, history);
+    const answer = await generateAnswer(query, retrievedContexts, history, language);
 
     return {
         answer,
@@ -171,7 +171,7 @@ export async function queryHybridFrontendSpecs(query: string, history: string[] 
     };
 }
 
-async function generateAnswer(query: string, contexts: string[], history: string[] = []): Promise<string> {
+async function generateAnswer(query: string, contexts: string[], history: string[] = [], language: string = 'English'): Promise<string> {
     const contextBlock = contexts.join("\n\n---\n\n");
     const historyBlock = history.length > 0 
         ? `\nPREVIOUS CONVERSATION HISTORY:\n${history.join('\n')}\n` 
@@ -187,6 +187,8 @@ async function generateAnswer(query: string, contexts: string[], history: string
   4. **Detailed Walkthroughs (User-Facing Names)**: Provide step-by-step guides ONLY using the visible labels or descriptive names of buttons, fields, and screens as they appear in the CONTEXT (e.g., "the 'Save' button", "the 'Add Job' button"). NEVER use technical component names like "UButton", "UTable", "UInput", or "V-model".
   5. **No Technical Jargon**: Do not mention "APIs", "Components", "Frontend/Backend", "JSON", or UI framework prefixes like "U-". Use business-friendly terms like "Service", "Screen", or "Feature".
   6. **Business-Centric**: Group information into high-level business capabilities instead of technical file structures.
+
+  7. **TARGET LANGUAGE**: Respond ONLY in **${language}**. This is a mandatory requirement.
 
   CONTEXT:
   ${contextBlock}
